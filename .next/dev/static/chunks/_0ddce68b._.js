@@ -779,19 +779,45 @@ const treatmentService = {
         return data;
     },
     async create (treatment) {
-        const { data, error } = await getSupabase().from("treatments").insert([
-            treatment
-        ]).select().single();
-        if (error) throw error;
-        return data;
+        try {
+            console.log("[v0] 💾 Creating treatment:", treatment);
+            const { data, error } = await getSupabase().from("treatments").insert([
+                treatment
+            ]).select().single();
+            if (error) {
+                console.error("[v0] ❌ Supabase error creating treatment:", error);
+                console.error("[v0] Error code:", error.code);
+                console.error("[v0] Error message:", error.message);
+                console.error("[v0] Error details:", error.details);
+                console.error("[v0] Error hint:", error.hint);
+                throw new Error(`Failed to create treatment: ${error.message}`);
+            }
+            console.log("[v0] ✅ Treatment created successfully:", data);
+            return data;
+        } catch (err) {
+            console.error("[v0] ❌ Exception in treatmentService.create:", err);
+            throw err;
+        }
     },
     async update (id, updates) {
-        const { data, error } = await getSupabase().from("treatments").update({
-            ...updates,
-            updated_at: new Date()
-        }).eq("id", id).select().single();
-        if (error) throw error;
-        return data;
+        try {
+            console.log("[v0] 📝 Updating treatment:", id, updates);
+            const { data, error } = await getSupabase().from("treatments").update({
+                ...updates,
+                updated_at: new Date()
+            }).eq("id", id).select().single();
+            if (error) {
+                console.error("[v0] ❌ Supabase error updating treatment:", error);
+                console.error("[v0] Error code:", error.code);
+                console.error("[v0] Error message:", error.message);
+                throw new Error(`Failed to update treatment: ${error.message}`);
+            }
+            console.log("[v0] ✅ Treatment updated successfully:", data);
+            return data;
+        } catch (err) {
+            console.error("[v0] ❌ Exception in treatmentService.update:", err);
+            throw err;
+        }
     },
     async delete (id) {
         const { error } = await getSupabase().from("treatments").delete().eq("id", id);
@@ -800,11 +826,26 @@ const treatmentService = {
 };
 const paymentService = {
     async getAll () {
-        const { data, error } = await getSupabase().from("payments").select("*, patients(name, email), dentists(name)").order("date", {
-            ascending: false
-        });
-        if (error) throw error;
-        return data;
+        try {
+            console.log("[v0] 🔍 Fetching all payments from database...");
+            const { data, error } = await getSupabase().from("payments").select("*, patients(name, email), dentists(name)").order("date", {
+                ascending: false
+            });
+            if (error) {
+                console.error("[v0] ❌ Error fetching payments:", error);
+                console.error("[v0] Error code:", error.code);
+                console.error("[v0] Error message:", error.message);
+                throw error;
+            }
+            console.log("[v0] ✅ Fetched", data?.length || 0, "payments from database");
+            if (data && data.length > 0) {
+                console.log("[v0] Sample payment:", data[0]);
+            }
+            return data || [];
+        } catch (err) {
+            console.error("[v0] ❌ Exception fetching all payments:", err);
+            throw err;
+        }
     },
     async getByPatientId (patientId) {
         try {

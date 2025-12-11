@@ -68,12 +68,25 @@ export default function HRPayments() {
 
   const loadData = async () => {
     try {
+      console.log("[v0] 🔄 Loading payments and patients from database...")
       setLoading(true)
-      const [paymentsData, patientsData] = await Promise.all([paymentService.getAll(), patientService.getAll()])
+      
+      const [paymentsData, patientsData] = await Promise.all([
+        paymentService.getAll(), 
+        patientService.getAll()
+      ])
+      
+      console.log("[v0] ✅ Loaded", paymentsData?.length || 0, "payments")
+      console.log("[v0] ✅ Loaded", patientsData?.length || 0, "patients")
+      
       setPayments(paymentsData || [])
       setPatients(patientsData || [])
     } catch (error) {
-      console.error("[v0] Error loading data:", error)
+      console.error("[v0] ❌ Error loading data:", error)
+      console.error("[v0] Error details:", error instanceof Error ? error.message : error)
+      // Set empty arrays on error to prevent UI crashes
+      setPayments([])
+      setPatients([])
     } finally {
       setLoading(false)
     }
@@ -92,15 +105,31 @@ export default function HRPayments() {
 
   const handleRecordPayment = async (data: any) => {
     try {
+      console.log("[v0] 💾 Recording payment to database:", data)
+      
+      // Create payment in database
       const newPayment = await paymentService.create(data)
-      setPayments([newPayment, ...payments])
-      setShowRecordModal(false)
-      // Reload all data to ensure consistency
+      
+      if (!newPayment || !newPayment.id) {
+        throw new Error("Payment was not saved to database")
+      }
+      
+      console.log("[v0] ✅ Payment saved to database with ID:", newPayment.id)
+      
+      // Reload all data from database to ensure we have fresh data
+      console.log("[v0] 🔄 Reloading all payments from database...")
       await loadData()
-      console.log("[v0] ✅ Payment recorded and data reloaded")
+      
+      console.log("[v0] ✅ Data reloaded successfully")
+      
+      // Only close modal after everything is saved and loaded
+      setShowRecordModal(false)
+      
+      alert(`✅ Payment recorded successfully!\n\nAmount: ₱${data.amount}\nStatus: ${data.status}\n\nPayment is now visible in the system.`)
     } catch (error) {
-      console.error("[v0] Error recording payment:", error)
-      alert("Error recording payment: " + (error instanceof Error ? error.message : "Unknown error"))
+      console.error("[v0] ❌ Error recording payment:", error)
+      alert("❌ Error recording payment: " + (error instanceof Error ? error.message : "Unknown error") + "\n\nPlease try again.")
+      // Don't close modal on error so user can retry
     }
   }
 

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 import { authService } from "@/lib/auth-service"
@@ -22,6 +22,29 @@ export default function LoginScreen() {
   const [regName, setRegName] = useState("")
   const [regPhone, setRegPhone] = useState("")
   // Registration is patient-only
+  const [quickLogins, setQuickLogins] = useState<Array<{email:string; role:string; name:string; icon?:string}>>([])
+
+  useEffect(() => {
+    const loadQuickLogins = async () => {
+      try {
+        const res = await fetch("/api/auth/quicklogins")
+        if (res.ok) {
+          const entries = await res.json()
+          // Map to display entries; ensure HR + dentists are present
+          const mapped = (entries as Array<any>).map((e) => ({
+            email: e.email,
+            role: e.role === "hr" ? "HR/Admin" : e.role === "dentist" ? e.name : e.name,
+            name: e.name,
+            icon: e.role === "hr" ? "👨‍💼" : e.role === "dentist" ? "👨‍⚕️" : "👤",
+          }))
+          setQuickLogins(mapped)
+        }
+      } catch (err) {
+        // Silent fail; keep defaults empty to avoid hardcoding
+      }
+    }
+    loadQuickLogins()
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -213,34 +236,32 @@ export default function LoginScreen() {
               <CardDescription>Click to auto-fill credentials</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {[
-                { email: "hr@mouthworks.com", role: "HR/Admin", password: "Changeme!123", icon: "👨‍💼" },
-                { email: "sarah.smith@dental.com", role: "Dr. Sarah Smith", password: "Changeme!123", icon: "👩‍⚕️" },
-                { email: "john.doe@dental.com", role: "Dr. John Doe", password: "Changeme!123", icon: "👨‍⚕️" },
-                { email: "emily.johnson@dental.com", role: "Dr. Emily Johnson", password: "Changeme!123", icon: "👩‍⚕️" },
-                { email: "michael.chen@dental.com", role: "Dr. Michael Chen", password: "Changeme!123", icon: "👨‍⚕️" },
-                { email: "lisa.anderson@dental.com", role: "Dr. Lisa Anderson", password: "Changeme!123", icon: "👩‍⚕️" },
-              ].map((cred) => (
-                <button
-                  key={cred.email}
-                  type="button"
-                  onClick={() => {
-                    setEmail(cred.email)
-                    setPassword(cred.password)
-                    setShowRegister(false)
-                  }}
-                  className="w-full p-4 text-left border border-border rounded-lg hover:bg-muted hover:border-primary hover:shadow-md transition-all group"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{cred.icon}</span>
-                    <div className="flex-1">
-                      <div className="font-semibold text-foreground group-hover:text-primary transition-colors">{cred.role}</div>
-                      <div className="text-xs text-muted-foreground truncate">{cred.email}</div>
+              {quickLogins.length === 0 ? (
+                <div className="text-sm text-muted-foreground">No quick login users found in database.</div>
+              ) : (
+                quickLogins.map((u) => (
+                  <button
+                    key={u.email}
+                    type="button"
+                    onClick={() => {
+                      setEmail(u.email)
+                      // Use a known dev password; actual auth must match Supabase
+                      setPassword("Changeme!123")
+                    }}
+                    className="w-full flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">{u.icon || "👤"}</span>
+                      <div>
+                        <div className="text-sm font-semibold text-foreground">{u.role}</div>
+                        <div className="text-xs text-muted-foreground">{u.email}</div>
+                      </div>
                     </div>
-                  </div>
-                </button>
-              ))}
-              <div className="pt-2 text-center">
+                    <span className="text-xs text-muted-foreground">From database</span>
+                  </button>
+                ))
+              )}
+            </CardContent>
                 <p className="text-xs text-muted-foreground">For development & testing purposes</p>
               </div>
             </CardContent>

@@ -70,17 +70,37 @@ export default function HRTreatments() {
 
   const handleAddTreatment = async (data: any) => {
     try {
+      console.log("[v0] 💾 Saving treatment data:", data)
+      
       if (editingTreatment) {
+        console.log("[v0] 📝 Updating existing treatment:", editingTreatment.id)
         const updated = await treatmentService.update(editingTreatment.id, data)
         setTreatments(treatments.map((t) => (t.id === editingTreatment.id ? updated : t)))
         setEditingTreatment(null)
+        console.log("[v0] ✅ Treatment updated successfully")
       } else {
+        console.log("[v0] ➕ Creating new treatment")
         const newTreatment = await treatmentService.create(data)
+        
+        if (!newTreatment || !newTreatment.id) {
+          throw new Error("Treatment was not created in database")
+        }
+        
         setTreatments([newTreatment, ...treatments])
+        console.log("[v0] ✅ Treatment created successfully with ID:", newTreatment.id)
       }
+      
       setShowAddModal(false)
+      await loadTreatments() // Reload to ensure fresh data
+      
+      alert(`✅ Treatment ${editingTreatment ? 'updated' : 'added'} successfully!`)
     } catch (error) {
-      console.error("[v0] Error saving treatment:", error)
+      console.error("[v0] ❌ Error saving treatment:", error)
+      console.error("[v0] Error type:", error instanceof Error ? error.constructor.name : typeof error)
+      console.error("[v0] Error message:", error instanceof Error ? error.message : JSON.stringify(error))
+      console.error("[v0] Full error object:", error)
+      
+      alert(`❌ Failed to ${editingTreatment ? 'update' : 'add'} treatment:\n\n${error instanceof Error ? error.message : 'Unknown error'}\n\nCheck console for details.`)
     }
   }
 

@@ -810,19 +810,45 @@ const treatmentService = {
         return data;
     },
     async create (treatment) {
-        const { data, error } = await getSupabase().from("treatments").insert([
-            treatment
-        ]).select().single();
-        if (error) throw error;
-        return data;
+        try {
+            console.log("[v0] 💾 Creating treatment:", treatment);
+            const { data, error } = await getSupabase().from("treatments").insert([
+                treatment
+            ]).select().single();
+            if (error) {
+                console.error("[v0] ❌ Supabase error creating treatment:", error);
+                console.error("[v0] Error code:", error.code);
+                console.error("[v0] Error message:", error.message);
+                console.error("[v0] Error details:", error.details);
+                console.error("[v0] Error hint:", error.hint);
+                throw new Error(`Failed to create treatment: ${error.message}`);
+            }
+            console.log("[v0] ✅ Treatment created successfully:", data);
+            return data;
+        } catch (err) {
+            console.error("[v0] ❌ Exception in treatmentService.create:", err);
+            throw err;
+        }
     },
     async update (id, updates) {
-        const { data, error } = await getSupabase().from("treatments").update({
-            ...updates,
-            updated_at: new Date()
-        }).eq("id", id).select().single();
-        if (error) throw error;
-        return data;
+        try {
+            console.log("[v0] 📝 Updating treatment:", id, updates);
+            const { data, error } = await getSupabase().from("treatments").update({
+                ...updates,
+                updated_at: new Date()
+            }).eq("id", id).select().single();
+            if (error) {
+                console.error("[v0] ❌ Supabase error updating treatment:", error);
+                console.error("[v0] Error code:", error.code);
+                console.error("[v0] Error message:", error.message);
+                throw new Error(`Failed to update treatment: ${error.message}`);
+            }
+            console.log("[v0] ✅ Treatment updated successfully:", data);
+            return data;
+        } catch (err) {
+            console.error("[v0] ❌ Exception in treatmentService.update:", err);
+            throw err;
+        }
     },
     async delete (id) {
         const { error } = await getSupabase().from("treatments").delete().eq("id", id);
@@ -831,11 +857,26 @@ const treatmentService = {
 };
 const paymentService = {
     async getAll () {
-        const { data, error } = await getSupabase().from("payments").select("*, patients(name, email), dentists(name)").order("date", {
-            ascending: false
-        });
-        if (error) throw error;
-        return data;
+        try {
+            console.log("[v0] 🔍 Fetching all payments from database...");
+            const { data, error } = await getSupabase().from("payments").select("*, patients(name, email), dentists(name)").order("date", {
+                ascending: false
+            });
+            if (error) {
+                console.error("[v0] ❌ Error fetching payments:", error);
+                console.error("[v0] Error code:", error.code);
+                console.error("[v0] Error message:", error.message);
+                throw error;
+            }
+            console.log("[v0] ✅ Fetched", data?.length || 0, "payments from database");
+            if (data && data.length > 0) {
+                console.log("[v0] Sample payment:", data[0]);
+            }
+            return data || [];
+        } catch (err) {
+            console.error("[v0] ❌ Exception fetching all payments:", err);
+            throw err;
+        }
     },
     async getByPatientId (patientId) {
         try {
@@ -2069,15 +2110,22 @@ function HRPayments() {
     }["HRPayments.useEffect"], []);
     const loadData = async ()=>{
         try {
+            console.log("[v0] 🔄 Loading payments and patients from database...");
             setLoading(true);
             const [paymentsData, patientsData] = await Promise.all([
                 __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["paymentService"].getAll(),
                 __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["patientService"].getAll()
             ]);
+            console.log("[v0] ✅ Loaded", paymentsData?.length || 0, "payments");
+            console.log("[v0] ✅ Loaded", patientsData?.length || 0, "patients");
             setPayments(paymentsData || []);
             setPatients(patientsData || []);
         } catch (error) {
-            console.error("[v0] Error loading data:", error);
+            console.error("[v0] ❌ Error loading data:", error);
+            console.error("[v0] Error details:", error instanceof Error ? error.message : error);
+            // Set empty arrays on error to prevent UI crashes
+            setPayments([]);
+            setPatients([]);
         } finally{
             setLoading(false);
         }
@@ -2089,7 +2137,7 @@ function HRPayments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 83,
+                lineNumber: 96,
                 columnNumber: 33
             }, this),
             href: "/hr/dashboard"
@@ -2100,7 +2148,7 @@ function HRPayments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 84,
+                lineNumber: 97,
                 columnNumber: 32
             }, this),
             href: "/hr/patients"
@@ -2111,7 +2159,7 @@ function HRPayments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 85,
+                lineNumber: 98,
                 columnNumber: 36
             }, this),
             href: "/hr/appointments"
@@ -2122,7 +2170,7 @@ function HRPayments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 86,
+                lineNumber: 99,
                 columnNumber: 34
             }, this),
             href: "/hr/treatments"
@@ -2133,7 +2181,7 @@ function HRPayments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 87,
+                lineNumber: 100,
                 columnNumber: 32
             }, this),
             href: "/hr/payments"
@@ -2144,7 +2192,7 @@ function HRPayments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 88,
+                lineNumber: 101,
                 columnNumber: 33
             }, this),
             href: "/hr/inventory"
@@ -2155,7 +2203,7 @@ function HRPayments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 89,
+                lineNumber: 102,
                 columnNumber: 31
             }, this),
             href: "/hr/reports"
@@ -2166,7 +2214,7 @@ function HRPayments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 90,
+                lineNumber: 103,
                 columnNumber: 32
             }, this),
             href: "/hr/settings"
@@ -2174,18 +2222,24 @@ function HRPayments() {
     ];
     const handleRecordPayment = async (data)=>{
         try {
+            console.log("[v0] 💾 Recording payment to database:", data);
+            // Create payment in database
             const newPayment = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["paymentService"].create(data);
-            setPayments([
-                newPayment,
-                ...payments
-            ]);
-            setShowRecordModal(false);
-            // Reload all data to ensure consistency
+            if (!newPayment || !newPayment.id) {
+                throw new Error("Payment was not saved to database");
+            }
+            console.log("[v0] ✅ Payment saved to database with ID:", newPayment.id);
+            // Reload all data from database to ensure we have fresh data
+            console.log("[v0] 🔄 Reloading all payments from database...");
             await loadData();
-            console.log("[v0] ✅ Payment recorded and data reloaded");
+            console.log("[v0] ✅ Data reloaded successfully");
+            // Only close modal after everything is saved and loaded
+            setShowRecordModal(false);
+            alert(`✅ Payment recorded successfully!\n\nAmount: ₱${data.amount}\nStatus: ${data.status}\n\nPayment is now visible in the system.`);
         } catch (error) {
-            console.error("[v0] Error recording payment:", error);
-            alert("Error recording payment: " + (error instanceof Error ? error.message : "Unknown error"));
+            console.error("[v0] ❌ Error recording payment:", error);
+            alert("❌ Error recording payment: " + (error instanceof Error ? error.message : "Unknown error") + "\n\nPlease try again.");
+        // Don't close modal on error so user can retry
         }
     };
     const handleDeletePayment = async (id)=>{
@@ -2267,7 +2321,7 @@ function HRPayments() {
                                         children: "Payment Tracking"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 173,
+                                        lineNumber: 202,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2275,13 +2329,13 @@ function HRPayments() {
                                         children: "Record and manage patient payments"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 174,
+                                        lineNumber: 203,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                lineNumber: 172,
+                                lineNumber: 201,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2294,7 +2348,7 @@ function HRPayments() {
                                         children: "🔄 Refresh"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 177,
+                                        lineNumber: 206,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -2305,26 +2359,26 @@ function HRPayments() {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 184,
+                                                lineNumber: 213,
                                                 columnNumber: 15
                                             }, this),
                                             "Record Payment"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 180,
+                                        lineNumber: 209,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                lineNumber: 176,
+                                lineNumber: 205,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/payments/page.tsx",
-                        lineNumber: 171,
+                        lineNumber: 200,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2340,12 +2394,12 @@ function HRPayments() {
                                             children: "Total Paid"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                            lineNumber: 194,
+                                            lineNumber: 223,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 193,
+                                        lineNumber: 222,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2355,7 +2409,7 @@ function HRPayments() {
                                                 children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatCurrency"])(totalPaid)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 197,
+                                                lineNumber: 226,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2366,19 +2420,19 @@ function HRPayments() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 198,
+                                                lineNumber: 227,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 196,
+                                        lineNumber: 225,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                lineNumber: 192,
+                                lineNumber: 221,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -2391,12 +2445,12 @@ function HRPayments() {
                                             children: "Partial Payments"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                            lineNumber: 204,
+                                            lineNumber: 233,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 203,
+                                        lineNumber: 232,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2406,7 +2460,7 @@ function HRPayments() {
                                                 children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatCurrency"])(totalPartial)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 207,
+                                                lineNumber: 236,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2417,19 +2471,19 @@ function HRPayments() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 208,
+                                                lineNumber: 237,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 206,
+                                        lineNumber: 235,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                lineNumber: 202,
+                                lineNumber: 231,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -2442,12 +2496,12 @@ function HRPayments() {
                                             children: "Unpaid Balance"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                            lineNumber: 214,
+                                            lineNumber: 243,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 213,
+                                        lineNumber: 242,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2457,7 +2511,7 @@ function HRPayments() {
                                                 children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatCurrency"])(totalUnpaid)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 217,
+                                                lineNumber: 246,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2468,19 +2522,19 @@ function HRPayments() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 218,
+                                                lineNumber: 247,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 216,
+                                        lineNumber: 245,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                lineNumber: 212,
+                                lineNumber: 241,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -2493,12 +2547,12 @@ function HRPayments() {
                                             children: "Total Revenue"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                            lineNumber: 224,
+                                            lineNumber: 253,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 223,
+                                        lineNumber: 252,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2508,7 +2562,7 @@ function HRPayments() {
                                                 children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatCurrency"])(totalPaid + totalPartial)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 227,
+                                                lineNumber: 256,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2516,25 +2570,25 @@ function HRPayments() {
                                                 children: "Received so far"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 228,
+                                                lineNumber: 257,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 226,
+                                        lineNumber: 255,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                lineNumber: 222,
+                                lineNumber: 251,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/payments/page.tsx",
-                        lineNumber: 191,
+                        lineNumber: 220,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -2548,7 +2602,7 @@ function HRPayments() {
                                             className: "absolute left-3 top-2.5 w-4 h-4 text-muted-foreground"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                            lineNumber: 237,
+                                            lineNumber: 266,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -2559,13 +2613,13 @@ function HRPayments() {
                                             className: "pl-10 border-border"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                            lineNumber: 238,
+                                            lineNumber: 267,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/payments/page.tsx",
-                                    lineNumber: 236,
+                                    lineNumber: 265,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2581,23 +2635,23 @@ function HRPayments() {
                                             children: status.charAt(0).toUpperCase() + status.slice(1)
                                         }, status, false, {
                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                            lineNumber: 249,
+                                            lineNumber: 278,
                                             columnNumber: 17
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/payments/page.tsx",
-                                    lineNumber: 247,
+                                    lineNumber: 276,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/hr/payments/page.tsx",
-                            lineNumber: 235,
+                            lineNumber: 264,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/hr/payments/page.tsx",
-                        lineNumber: 234,
+                        lineNumber: 263,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -2608,7 +2662,7 @@ function HRPayments() {
                                         children: "Payment Records"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 268,
+                                        lineNumber: 297,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardDescription"], {
@@ -2618,13 +2672,13 @@ function HRPayments() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 269,
+                                        lineNumber: 298,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                lineNumber: 267,
+                                lineNumber: 296,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2642,7 +2696,7 @@ function HRPayments() {
                                                             children: "Date"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                            lineNumber: 276,
+                                                            lineNumber: 305,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2650,7 +2704,7 @@ function HRPayments() {
                                                             children: "Patient"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                            lineNumber: 277,
+                                                            lineNumber: 306,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2658,7 +2712,7 @@ function HRPayments() {
                                                             children: "Dentist"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                            lineNumber: 278,
+                                                            lineNumber: 307,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2666,7 +2720,7 @@ function HRPayments() {
                                                             children: "Description"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                            lineNumber: 279,
+                                                            lineNumber: 308,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2674,7 +2728,7 @@ function HRPayments() {
                                                             children: "Amount"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                            lineNumber: 280,
+                                                            lineNumber: 309,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2682,7 +2736,7 @@ function HRPayments() {
                                                             children: "Method"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                            lineNumber: 281,
+                                                            lineNumber: 310,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2690,7 +2744,7 @@ function HRPayments() {
                                                             children: "Status"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                            lineNumber: 282,
+                                                            lineNumber: 311,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2698,18 +2752,18 @@ function HRPayments() {
                                                             children: "Actions"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                            lineNumber: 283,
+                                                            lineNumber: 312,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/payments/page.tsx",
-                                                    lineNumber: 275,
+                                                    lineNumber: 304,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 274,
+                                                lineNumber: 303,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -2720,12 +2774,12 @@ function HRPayments() {
                                                         children: "No payments found"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                                        lineNumber: 289,
+                                                        lineNumber: 318,
                                                         columnNumber: 23
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/payments/page.tsx",
-                                                    lineNumber: 288,
+                                                    lineNumber: 317,
                                                     columnNumber: 21
                                                 }, this) : filteredPayments.map((payment)=>{
                                                     const patient = patients.find((p)=>p.id === payment.patient_id);
@@ -2737,7 +2791,7 @@ function HRPayments() {
                                                                 children: payment.date ? new Date(payment.date).toLocaleDateString() : "-"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                lineNumber: 298,
+                                                                lineNumber: 327,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2745,7 +2799,7 @@ function HRPayments() {
                                                                 children: patient?.name || "Unknown"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                lineNumber: 301,
+                                                                lineNumber: 330,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2753,7 +2807,7 @@ function HRPayments() {
                                                                 children: payment.dentists?.name || "-"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                lineNumber: 304,
+                                                                lineNumber: 333,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2761,7 +2815,7 @@ function HRPayments() {
                                                                 children: payment.description || "-"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                lineNumber: 305,
+                                                                lineNumber: 334,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2769,7 +2823,7 @@ function HRPayments() {
                                                                 children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatCurrency"])(payment.amount)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                lineNumber: 306,
+                                                                lineNumber: 335,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2777,7 +2831,7 @@ function HRPayments() {
                                                                 children: payment.method || "-"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                lineNumber: 309,
+                                                                lineNumber: 338,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2794,7 +2848,7 @@ function HRPayments() {
                                                                             children: "Paid"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                                            lineNumber: 319,
+                                                                            lineNumber: 348,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -2802,7 +2856,7 @@ function HRPayments() {
                                                                             children: "Partial"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                                            lineNumber: 320,
+                                                                            lineNumber: 349,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -2810,13 +2864,13 @@ function HRPayments() {
                                                                             children: "Unpaid"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                                            lineNumber: 321,
+                                                                            lineNumber: 350,
                                                                             columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/hr/payments/page.tsx",
-                                                                    lineNumber: 312,
+                                                                    lineNumber: 341,
                                                                     columnNumber: 31
                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                                     onClick: ()=>{
@@ -2830,25 +2884,25 @@ function HRPayments() {
                                                                             className: "w-3 h-3"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                                            lineNumber: 339,
+                                                                            lineNumber: 368,
                                                                             columnNumber: 35
                                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__["AlertCircle"], {
                                                                             className: "w-3 h-3"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                                            lineNumber: 341,
+                                                                            lineNumber: 370,
                                                                             columnNumber: 35
                                                                         }, this),
                                                                         payment.status.charAt(0).toUpperCase() + payment.status.slice(1)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/hr/payments/page.tsx",
-                                                                    lineNumber: 324,
+                                                                    lineNumber: 353,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                lineNumber: 310,
+                                                                lineNumber: 339,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2864,12 +2918,12 @@ function HRPayments() {
                                                                                 className: "w-4 h-4"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                                lineNumber: 354,
+                                                                                lineNumber: 383,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                                            lineNumber: 349,
+                                                                            lineNumber: 378,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2880,63 +2934,63 @@ function HRPayments() {
                                                                                 className: "w-4 h-4"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                                lineNumber: 361,
+                                                                                lineNumber: 390,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/payments/page.tsx",
-                                                                            lineNumber: 356,
+                                                                            lineNumber: 385,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/hr/payments/page.tsx",
-                                                                    lineNumber: 348,
+                                                                    lineNumber: 377,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                                lineNumber: 347,
+                                                                lineNumber: 376,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, payment.id, true, {
                                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                                        lineNumber: 297,
+                                                        lineNumber: 326,
                                                         columnNumber: 25
                                                     }, this);
                                                 })
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                                lineNumber: 286,
+                                                lineNumber: 315,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/payments/page.tsx",
-                                        lineNumber: 273,
+                                        lineNumber: 302,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/payments/page.tsx",
-                                    lineNumber: 272,
+                                    lineNumber: 301,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/payments/page.tsx",
-                                lineNumber: 271,
+                                lineNumber: 300,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/payments/page.tsx",
-                        lineNumber: 266,
+                        lineNumber: 295,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 169,
+                lineNumber: 198,
                 columnNumber: 7
             }, this),
             loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -2947,17 +3001,17 @@ function HRPayments() {
                         children: "Loading payments..."
                     }, void 0, false, {
                         fileName: "[project]/app/hr/payments/page.tsx",
-                        lineNumber: 379,
+                        lineNumber: 408,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/hr/payments/page.tsx",
-                    lineNumber: 378,
+                    lineNumber: 407,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/hr/payments/page.tsx",
-                lineNumber: 377,
+                lineNumber: 406,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                 children: showRecordModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modals$2f$record$2d$payment$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2965,14 +3019,14 @@ function HRPayments() {
                     onSubmit: handleRecordPayment
                 }, void 0, false, {
                     fileName: "[project]/app/hr/payments/page.tsx",
-                    lineNumber: 385,
+                    lineNumber: 414,
                     columnNumber: 13
                 }, this)
             }, void 0, false)
         ]
     }, void 0, true, {
         fileName: "[project]/app/hr/payments/page.tsx",
-        lineNumber: 168,
+        lineNumber: 197,
         columnNumber: 5
     }, this);
 }
