@@ -756,3 +756,364 @@ Import traces:
     ./components/auth/login-screen.tsx [Client Component SSR]
     ./app/login/page.tsx [Client Component SSR]
     ./app/login/page.tsx [Server Component]
+[00:50:05.890] Browser ERROR   ./components/auth/login-screen.tsx:266:21
+Parsing ecmascript source code failed
+  264 |             </CardContent>
+  265 |                 <p className="text-xs text-muted-foreground">For development & testing purposes</p>
+> 266 |               </div>
+      |                     ^
+> 267 |             </CardContent>
+      | ^^^^^^^^^^^^^
+  268 |           </Card>
+  269 |         </div>
+  270 |       </div>
+
+Expected '</', got 'jsx text (
+            )'
+
+Import traces:
+  Client Component Browser:
+    ./components/auth/login-screen.tsx [Client Component Browser]
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/auth/login-screen.tsx [Client Component SSR]
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+[00:50:06.897] Browser ERROR   ./components/auth/login-screen.tsx:266:21
+Parsing ecmascript source code failed
+  264 |             </CardContent>
+  265 |                 <p className="text-xs text-muted-foreground">For development & testing purposes</p>
+> 266 |               </div>
+      |                     ^
+> 267 |             </CardContent>
+      | ^^^^^^^^^^^^^
+  268 |           </Card>
+  269 |         </div>
+  270 |       </div>
+
+Expected '</', got 'jsx text (
+            )'
+
+Import traces:
+  Client Component Browser:
+    ./components/auth/login-screen.tsx [Client Component Browser]
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/auth/login-screen.tsx [Client Component SSR]
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+[00:50:06.897] Browser ERROR   ./components/auth/login-screen.tsx:266:21
+Parsing ecmascript source code failed
+  264 |             </CardContent>
+  265 |                 <p className="text-xs text-muted-foreground">For development & testing purposes</p>
+> 266 |               </div>
+      |                     ^
+> 267 |             </CardContent>
+      | ^^^^^^^^^^^^^
+  268 |           </Card>
+  269 |         </div>
+  270 |       </div>
+
+Expected '</', got 'jsx text (
+            )'
+
+Import traces:
+  Client Component Browser:
+    ./components/auth/login-screen.tsx [Client Component Browser]
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/auth/login-screen.tsx [Client Component SSR]
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+[00:50:06.897] Browser ERROR   ./components/auth/login-screen.tsx:266:21
+Parsing ecmascript source code failed
+  264 |             </CardContent>
+  265 |                 <p className="text-xs text-muted-foreground">For development & testing purposes</p>
+> 266 |               </div>
+      |                     ^
+> 267 |             </CardContent>
+      | ^^^^^^^^^^^^^
+  268 |           </Card>
+  269 |         </div>
+  270 |       </div>
+
+Expected '</', got 'jsx text (
+            )'
+
+Import traces:
+  Client Component Browser:
+    ./components/auth/login-screen.tsx [Client Component Browser]
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/auth/login-screen.tsx [Client Component SSR]
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+[00:50:08.883] Browser ERROR   ./components/auth/login-screen.tsx:266:21
+Parsing ecmascript source code failed
+  264 |             </CardContent>
+  265 |                 <p className="text-xs text-muted-foreground">For development & testing purposes</p>
+> 266 |               </div>
+      |                     ^
+> 267 |             </CardContent>
+      | ^^^^^^^^^^^^^
+  268 |           </Card>
+  269 |         </div>
+  270 |       </div>
+
+Expected '</', got 'jsx text (
+            )'
+
+Import traces:
+  Client Component Browser:
+    ./components/auth/login-screen.tsx [Client Component Browser]
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/auth/login-screen.tsx [Client Component SSR]
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+[00:50:13.116] Server  LOG      ✓ Compiled in 66ms
+[00:50:32.813] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:50:32.813] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:50:33.098] Browser LOG     [v0] ✅ Fetched 18 payments from database
+[00:50:33.098] Browser LOG     [v0] Sample payment: {"amount":35,"appointment_id":"8e241d0f-d242-4769-98de-fd56098f45d1","created_at":"2025-12-11T20:23:31.999179","date":"2025-12-11","dentist_id":"1cccfa0f-f7f2-4165-b71b-ad56adbc3e46","dentists":{"name":"Dr. Lisa Anderson"},"description":"Prophylaxis (Cleaning) - 2025-12-12","id":"a6f5a068-9dee-4af2-875a-31288b15b4d3","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T20:23:31.999179"}
+[00:50:33.210] Browser LOG     [v0] ✅ Fetched 18 payments from database
+[00:50:33.210] Browser LOG     [v0] Sample payment: {"amount":35,"appointment_id":"8e241d0f-d242-4769-98de-fd56098f45d1","created_at":"2025-12-11T20:23:31.999179","date":"2025-12-11","dentist_id":"1cccfa0f-f7f2-4165-b71b-ad56adbc3e46","dentists":{"name":"Dr. Lisa Anderson"},"description":"Prophylaxis (Cleaning) - 2025-12-12","id":"a6f5a068-9dee-4af2-875a-31288b15b4d3","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T20:23:31.999179"}
+[00:50:59.039] Browser LOG     [v0] Submitting appointment for service: Comprehensive Oral Exam (price: ₱50 will be charged when completed)
+[00:50:59.039] Browser LOG     [v0] HR creating appointment with data: {"date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","service":"Comprehensive Oral Exam","status":"pending","time":"11:00"}
+[00:50:59.039] Browser LOG     [v0] 💾 Creating appointment in database: {"date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","service":"Comprehensive Oral Exam","status":"pending","time":"11:00"}
+[00:50:59.238] Browser LOG     [v0] ✅ Appointment saved to database: {"amount":0,"created_at":"2025-12-11T21:19:06.504937","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","notes":"","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"name":"Kent Sarsalejo"},"service":"Comprehensive Oral Exam","status":"pending","time":"11:00","treatment_id":null,"updated_at":"2025-12-11T21:19:06.504937"}
+[00:50:59.238] Browser LOG     [v0] ✅ Appointment created successfully: {"amount":0,"created_at":"2025-12-11T21:19:06.504937","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","notes":"","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"name":"Kent Sarsalejo"},"service":"Comprehensive Oral Exam","status":"pending","time":"11:00","treatment_id":null,"updated_at":"2025-12-11T21:19:06.504937"}
+[00:51:16.477] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:51:16.634] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:51:16.634] Browser LOG     [v0] ✅ Found 5 payments for dentist
+[00:51:16.634] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:51:16.760] Browser LOG     [v0] ✅ Found 5 payments for dentist
+[00:51:16.760] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:51:19.199] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:51:19.347] Browser LOG     [v0] ✅ Found 5 payments for dentist
+[00:51:19.348] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:51:26.093] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:51:26.093] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:51:26.387] Browser LOG     [v0] ✅ Fetched 18 payments from database
+[00:51:26.387] Browser LOG     [v0] Sample payment: {"amount":35,"appointment_id":"8e241d0f-d242-4769-98de-fd56098f45d1","created_at":"2025-12-11T20:23:31.999179","date":"2025-12-11","dentist_id":"1cccfa0f-f7f2-4165-b71b-ad56adbc3e46","dentists":{"name":"Dr. Lisa Anderson"},"description":"Prophylaxis (Cleaning) - 2025-12-12","id":"a6f5a068-9dee-4af2-875a-31288b15b4d3","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T20:23:31.999179"}
+[00:51:26.520] Browser LOG     [v0] ✅ Fetched 18 payments from database
+[00:51:26.520] Browser LOG     [v0] Sample payment: {"amount":35,"appointment_id":"8e241d0f-d242-4769-98de-fd56098f45d1","created_at":"2025-12-11T20:23:31.999179","date":"2025-12-11","dentist_id":"1cccfa0f-f7f2-4165-b71b-ad56adbc3e46","dentists":{"name":"Dr. Lisa Anderson"},"description":"Prophylaxis (Cleaning) - 2025-12-12","id":"a6f5a068-9dee-4af2-875a-31288b15b4d3","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T20:23:31.999179"}
+[00:51:30.142] Browser LOG     [v0] ✅ Appointment marked as attended
+[00:51:37.071] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:51:37.228] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:51:37.228] Browser LOG     [v0] ✅ Found 5 payments for dentist
+[00:51:37.228] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:51:37.334] Browser LOG     [v0] ✅ Found 5 payments for dentist
+[00:51:37.334] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:51:40.050] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:51:40.240] Browser LOG     [v0] ✅ Found 5 payments for dentist
+[00:51:40.240] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:51:43.051] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:51:43.216] Browser LOG     [v0] ✅ Found 5 payments for dentist
+[00:51:43.216] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:51:44.569] Browser LOG     [v0] 🔄 Starting handleSaveAndComplete...
+[00:51:44.569] Browser LOG     [v0] Selected appointment: {"amount":0,"created_at":"2025-12-11T21:19:06.504937","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","notes":"","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"service":"Comprehensive Oral Exam","status":"attended","time":"11:00","treatment_id":null,"updated_at":"2025-12-11T21:19:36.662"}
+[00:51:44.569] Browser LOG     [v0] Treatments to save: [{"name":"Deep Cleaning (SRP)","price":300,"quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"},{"name":"Implant Crown","price":1500,"quantity":1,"treatment_id":"cde29cc8-7646-488c-b93a-9b79a4c9ee45"}]
+[00:51:44.569] Browser LOG     [v0] Total amount: 1800
+[00:51:44.569] Browser LOG     [v0] 💾 Saving treatments to treatment_records...
+[00:51:44.569] Browser LOG     [v0] Saving treatment 1/2: {"name":"Deep Cleaning (SRP)","price":300,"quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}
+[00:51:44.569] Browser LOG     [v0] Record data: {"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"Deep Cleaning (SRP) - 1x","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}
+[00:51:44.569] Browser LOG     [v0] treatmentRecordService.create called with: {"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"Deep Cleaning (SRP) - 1x","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}
+[00:51:44.727] Browser LOG     [v0] ✅ Treatment record created successfully: {"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:19:52.016131","date":"2025-12-26T00:00:00","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":null,"id":"334405dc-c849-484c-ad62-218303e790c4","notes":"Deep Cleaning (SRP) - 1x","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d","treatments":{"name":"Deep Cleaning (SRP)"},"updated_at":"2025-12-11T21:19:52.016131"}
+[00:51:44.727] Browser LOG     [v0] ✅ Treatment 1 saved successfully: {"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:19:52.016131","date":"2025-12-26T00:00:00","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":null,"id":"334405dc-c849-484c-ad62-218303e790c4","notes":"Deep Cleaning (SRP) - 1x","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d","treatments":{"name":"Deep Cleaning (SRP)"},"updated_at":"2025-12-11T21:19:52.016131"}
+[00:51:44.727] Browser LOG     [v0] Saving treatment 2/2: {"name":"Implant Crown","price":1500,"quantity":1,"treatment_id":"cde29cc8-7646-488c-b93a-9b79a4c9ee45"}
+[00:51:44.727] Browser LOG     [v0] Record data: {"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"Implant Crown - 1x","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","quantity":1,"treatment_id":"cde29cc8-7646-488c-b93a-9b79a4c9ee45"}
+[00:51:44.727] Browser LOG     [v0] treatmentRecordService.create called with: {"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"Implant Crown - 1x","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","quantity":1,"treatment_id":"cde29cc8-7646-488c-b93a-9b79a4c9ee45"}
+[00:51:44.852] Browser LOG     [v0] ✅ Treatment record created successfully: {"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:19:52.151773","date":"2025-12-26T00:00:00","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":null,"id":"a55dcba5-78a5-4a1f-b879-4acfb5f1c956","notes":"Implant Crown - 1x","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","quantity":1,"treatment_id":"cde29cc8-7646-488c-b93a-9b79a4c9ee45","treatments":{"name":"Implant Crown"},"updated_at":"2025-12-11T21:19:52.151773"}
+[00:51:44.852] Browser LOG     [v0] ✅ Treatment 2 saved successfully: {"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:19:52.151773","date":"2025-12-26T00:00:00","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":null,"id":"a55dcba5-78a5-4a1f-b879-4acfb5f1c956","notes":"Implant Crown - 1x","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","quantity":1,"treatment_id":"cde29cc8-7646-488c-b93a-9b79a4c9ee45","treatments":{"name":"Implant Crown"},"updated_at":"2025-12-11T21:19:52.151773"}
+[00:51:44.852] Browser LOG     [v0] 📝 Updating appointment status and amount...
+[00:51:44.977] Browser LOG     [v0] ✅ Appointment updated successfully
+[00:51:44.977] Browser LOG     [v0] 🔄 Updating local state...
+[00:51:44.977] Browser LOG     [v0] 🎉 Showing completion modal...
+[00:51:44.977] Browser LOG     [v0] 🔄 Reloading appointments...
+[00:51:45.261] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:51:45.403] Browser LOG     [v0] ✅ Found 5 payments for dentist
+[00:51:45.403] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:51:45.403] Browser LOG     [v0] ✅ All done!
+[00:51:46.071] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:51:46.278] Browser LOG     [v0] ✅ Found 5 payments for dentist
+[00:51:46.278] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:51:51.012] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:51:51.012] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:51:51.167] Browser LOG     [v0] ✅ Fetched 18 payments from database
+[00:51:51.167] Browser LOG     [v0] Sample payment: {"amount":35,"appointment_id":"8e241d0f-d242-4769-98de-fd56098f45d1","created_at":"2025-12-11T20:23:31.999179","date":"2025-12-11","dentist_id":"1cccfa0f-f7f2-4165-b71b-ad56adbc3e46","dentists":{"name":"Dr. Lisa Anderson"},"description":"Prophylaxis (Cleaning) - 2025-12-12","id":"a6f5a068-9dee-4af2-875a-31288b15b4d3","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T20:23:31.999179"}
+[00:51:51.327] Browser LOG     [v0] ✅ Fetched 18 payments from database
+[00:51:51.327] Browser LOG     [v0] Sample payment: {"amount":35,"appointment_id":"8e241d0f-d242-4769-98de-fd56098f45d1","created_at":"2025-12-11T20:23:31.999179","date":"2025-12-11","dentist_id":"1cccfa0f-f7f2-4165-b71b-ad56adbc3e46","dentists":{"name":"Dr. Lisa Anderson"},"description":"Prophylaxis (Cleaning) - 2025-12-12","id":"a6f5a068-9dee-4af2-875a-31288b15b4d3","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T20:23:31.999179"}
+[00:51:56.529] Browser LOG     [v0] 💾 Creating payment via server API: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Comprehensive Oral Exam - 2025-12-26","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","status":"paid"}
+[00:51:56.557] Server  LOG     [v0] 💾 Server-side payment creation: {}
+[00:51:56.748] Server  LOG     [v0] ✅ Payment created successfully: {}
+[00:51:56.859] Browser LOG     [v0] ✅ Payment saved to database successfully: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:52:46.413] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:52:46.413] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:52:46.413] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:52:46.413] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:52:47.062] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:52:47.062] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:52:47.062] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:52:47.062] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:52:47.272] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:52:47.272] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:52:47.272] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:52:47.272] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:52:49.435] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:52:49.435] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:52:49.723] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:52:49.723] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:52:49.723] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:52:49.723] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:52:52.414] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:52:52.414] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:52:52.709] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:52:52.709] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:52:52.709] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:52:52.709] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:52:55.432] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:52:55.432] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:52:55.684] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:52:55.684] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:52:55.684] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:52:55.684] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:52:59.883] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:52:59.883] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:52:59.883] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:52:59.883] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:52:59.883] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:52:59.883] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:02.892] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:02.892] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:02.892] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:02.892] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:53:02.892] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:02.892] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:05.893] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:05.893] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:05.893] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:05.893] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:53:05.893] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:05.893] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:08.884] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:08.884] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:08.884] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:08.884] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:53:08.884] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:08.884] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:11.897] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:11.897] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:11.897] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:11.897] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:53:11.897] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:11.897] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:14.885] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:14.885] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:14.885] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:14.885] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:53:14.885] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:14.885] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:17.897] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:17.897] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:17.897] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:17.897] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:53:17.897] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:17.897] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:20.889] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:20.889] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:20.889] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:20.889] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:20.889] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:20.889] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:22.536] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:22.536] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:22.771] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:22.771] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:22.771] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:22.771] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:25.414] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:25.414] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:25.626] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:25.626] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:53:25.626] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:25.626] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:28.422] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:28.422] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:28.612] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:28.612] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:53:28.612] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:28.612] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:31.430] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:31.430] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:31.656] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:31.656] Browser LOG     [v0] Sample payment: {"amount":1800,"appointment_id":"13cba21b-fbd3-4f57-9b88-8803cfabd1a1","created_at":"2025-12-11T21:20:04.131216","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Comprehensive Oral Exam - 2025-12-26","id":"cc382f9d-55c7-46c0-b4f5-0a414680b101","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T21:20:04.131216"}
+[00:53:31.656] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:31.656] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:34.429] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:34.429] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:34.601] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:34.601] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:34.601] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:34.601] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:37.422] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:37.422] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:37.612] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:37.612] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:37.612] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:37.612] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:40.429] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:40.430] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:40.605] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:40.605] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:40.605] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:40.605] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:43.411] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:43.411] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:43.656] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:43.656] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:43.656] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:43.656] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:46.431] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:46.431] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:46.638] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:46.638] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:46.638] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:46.638] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:49.409] Browser LOG     [v0] 🔄 Loading payments and patients from database...
+[00:53:49.409] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:49.630] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:49.630] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:49.630] Browser LOG     [v0] ✅ Loaded 19 payments
+[00:53:49.630] Browser LOG     [v0] ✅ Loaded 9 patients
+[00:53:52.276] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:52.276] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:52.431] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:52.431] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:52.549] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:52.549] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:53:58.893] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:53:58.893] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:53:58.893] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:54:03.888] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:54:03.888] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:54:03.888] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:54:08.897] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:54:08.897] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:54:08.897] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:54:13.897] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:54:13.897] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:54:13.897] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:54:18.897] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:54:18.897] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:54:18.897] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}

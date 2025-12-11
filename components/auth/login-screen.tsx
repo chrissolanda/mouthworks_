@@ -262,9 +262,6 @@ export default function LoginScreen() {
                 ))
               )}
             </CardContent>
-                <p className="text-xs text-muted-foreground">For development & testing purposes</p>
-              </div>
-            </CardContent>
           </Card>
         </div>
       </div>

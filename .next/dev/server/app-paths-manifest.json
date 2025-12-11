@@ -1,8 +1,12 @@
 {
+  "/api/auth/quicklogins/route": "app/api/auth/quicklogins/route.js",
+  "/api/payments/create/route": "app/api/payments/create/route.js",
+  "/dentist/dashboard/page": "app/dentist/dashboard/page.js",
   "/hr/appointments/page": "app/hr/appointments/page.js",
   "/hr/dashboard/page": "app/hr/dashboard/page.js",
   "/hr/patients/page": "app/hr/patients/page.js",
   "/hr/payments/page": "app/hr/payments/page.js",
+  "/hr/reports/page": "app/hr/reports/page.js",
   "/hr/settings/page": "app/hr/settings/page.js",
   "/hr/treatments/page": "app/hr/treatments/page.js",
   "/login/page": "app/login/page.js",
