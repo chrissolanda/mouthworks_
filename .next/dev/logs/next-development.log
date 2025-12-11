@@ -1,0 +1,37 @@
+[00:00:00.774] Server  LOG      ✓ Ready in 534ms
+[00:18:11.657] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:18:13.193] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:18:16.361] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:37:17.564] Server  LOG      ✓ Compiled in 130ms
+[00:37:26.592] Server  LOG      ✓ Compiled in 71ms
+[00:37:27.060] Browser ERROR   ./components/auth/login-screen.tsx:248:1
+Parsing ecmascript source code failed
+  246 |     </div>
+  247 |   )
+> 248 | }
+      | ^
+  249 |
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./components/auth/login-screen.tsx [Client Component Browser]
+    ./app/page.tsx [Client Component Browser]
+    ./app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/auth/login-screen.tsx [Client Component SSR]
+    ./app/page.tsx [Client Component SSR]
+    ./app/page.tsx [Server Component]
+[00:37:56.473] Server  LOG      ✓ Compiled in 75ms
+[00:39:20.589] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:41:05.954] Server  LOG      ✓ Compiled in 132ms
+[00:41:14.855] Server  LOG      ✓ Compiled in 77ms
+[00:41:26.457] Server  LOG      ✓ Compiled in 109ms
+[00:41:33.760] Server  LOG      ✓ Compiled in 108ms
+[00:42:20.960] Server  LOG      ✓ Compiled in 117ms
+[00:42:38.444] Server  LOG      ✓ Compiled in 113ms
+[00:47:30.162] Server  LOG      ✓ Compiled in 72ms
+[00:47:47.375] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:58:33.801] Server  LOG      ✓ Compiled in 160ms
