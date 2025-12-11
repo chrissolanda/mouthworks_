@@ -1117,3 +1117,714 @@ Import traces:
 [00:54:18.897] Browser LOG     [v0] 🔍 Fetching all payments from database...
 [00:54:18.897] Browser LOG     [v0] ✅ Fetched 19 payments from database
 [00:54:18.897] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:54:23.885] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:54:23.885] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:54:23.885] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:54:27.296] Browser LOG     [v0] 🔍 Fetching all payments from database...
+[00:54:27.423] Browser LOG     [v0] ✅ Fetched 19 payments from database
+[00:54:27.423] Browser LOG     [v0] Sample payment: {"amount":50,"appointment_id":null,"created_at":"2025-12-11T14:33:53.823054","date":"2025-12-11","dentist_id":"0ad5b3e1-3fd9-485a-96a4-871913bdbde7","dentists":{"name":"Dr. Emily Johnson"},"description":"Comprehensive Oral Exam - Payment collected","id":"f3d50a49-90fa-4ab9-86f8-05b801a967dd","method":"cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T14:33:53.823054"}
+[00:54:35.686] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:35.822] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:35.822] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:35.822] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:35.931] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:35.931] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:36.741] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:36.741] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:36.875] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:36.875] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:36.875] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:36.875] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:36.875] Browser LOG     [v0] Payments loaded: 6
+[00:54:36.875] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:36.978] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:36.978] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:36.978] Browser LOG     [v0] Payments loaded: 6
+[00:54:36.978] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:39.886] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:39.886] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:40.027] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:40.027] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:40.027] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:40.027] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:40.027] Browser LOG     [v0] Payments loaded: 6
+[00:54:40.027] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:40.141] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:40.141] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:40.141] Browser LOG     [v0] Payments loaded: 6
+[00:54:40.141] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:43.970] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:43.970] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:43.970] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:43.970] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:43.970] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:43.970] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:43.970] Browser LOG     [v0] Payments loaded: 6
+[00:54:43.970] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:43.970] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:43.970] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:43.970] Browser LOG     [v0] Payments loaded: 6
+[00:54:43.970] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:46.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:46.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:46.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:46.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:46.885] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:46.885] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:46.885] Browser LOG     [v0] Payments loaded: 6
+[00:54:46.885] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:46.885] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:46.885] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:46.885] Browser LOG     [v0] Payments loaded: 6
+[00:54:46.885] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:49.894] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:49.894] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:49.894] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:49.894] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:49.894] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:49.894] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:49.894] Browser LOG     [v0] Payments loaded: 6
+[00:54:49.894] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:49.894] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:49.894] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:49.894] Browser LOG     [v0] Payments loaded: 6
+[00:54:49.894] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:52.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:52.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:52.886] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:52.886] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:52.886] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:52.886] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:52.886] Browser LOG     [v0] Payments loaded: 6
+[00:54:52.886] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:52.886] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:52.886] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:52.886] Browser LOG     [v0] Payments loaded: 6
+[00:54:52.886] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:55.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:55.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:55.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:55.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:55.885] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:55.885] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:55.885] Browser LOG     [v0] Payments loaded: 6
+[00:54:55.885] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:55.885] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:55.885] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:55.885] Browser LOG     [v0] Payments loaded: 6
+[00:54:55.885] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:58.897] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:58.897] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:58.897] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:58.897] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:54:58.897] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:58.897] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:58.897] Browser LOG     [v0] Payments loaded: 6
+[00:54:58.897] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:54:58.897] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:54:58.897] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:54:58.897] Browser LOG     [v0] Payments loaded: 6
+[00:54:58.897] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:01.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:01.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:01.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:01.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:01.885] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:01.885] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:01.885] Browser LOG     [v0] Payments loaded: 6
+[00:55:01.885] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:01.885] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:01.885] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:01.885] Browser LOG     [v0] Payments loaded: 6
+[00:55:01.885] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:04.894] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:04.894] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:04.894] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:04.894] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:04.894] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:04.894] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:04.894] Browser LOG     [v0] Payments loaded: 6
+[00:55:04.894] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:04.894] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:04.894] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:04.894] Browser LOG     [v0] Payments loaded: 6
+[00:55:04.894] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:07.890] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:07.890] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:07.890] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:07.890] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:07.890] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:07.890] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:07.890] Browser LOG     [v0] Payments loaded: 6
+[00:55:07.890] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:07.890] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:07.890] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:07.890] Browser LOG     [v0] Payments loaded: 6
+[00:55:07.890] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:10.888] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:10.888] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:10.888] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:10.888] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:10.888] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:10.888] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:10.888] Browser LOG     [v0] Payments loaded: 6
+[00:55:10.888] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:10.888] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:10.888] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:10.888] Browser LOG     [v0] Payments loaded: 6
+[00:55:10.888] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:13.895] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:13.895] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:13.895] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:13.895] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:13.895] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:13.895] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:13.895] Browser LOG     [v0] Payments loaded: 6
+[00:55:13.895] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:13.895] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:13.895] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:13.895] Browser LOG     [v0] Payments loaded: 6
+[00:55:13.895] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:16.898] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:16.898] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:16.898] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:16.898] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:16.898] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:16.898] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:16.898] Browser LOG     [v0] Payments loaded: 6
+[00:55:16.898] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:16.898] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:16.898] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:16.898] Browser LOG     [v0] Payments loaded: 6
+[00:55:16.898] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:19.900] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:19.900] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:19.900] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:19.900] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:19.900] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:19.900] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:19.900] Browser LOG     [v0] Payments loaded: 6
+[00:55:19.900] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:19.900] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:19.900] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:19.900] Browser LOG     [v0] Payments loaded: 6
+[00:55:19.900] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:22.899] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:22.899] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:22.899] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:22.899] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:22.899] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:22.899] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:22.899] Browser LOG     [v0] Payments loaded: 6
+[00:55:22.899] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:22.899] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:22.899] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:22.899] Browser LOG     [v0] Payments loaded: 6
+[00:55:22.899] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:25.887] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:25.887] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:25.887] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:25.887] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:25.887] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:25.887] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:25.887] Browser LOG     [v0] Payments loaded: 6
+[00:55:25.887] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:25.887] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:25.887] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:25.887] Browser LOG     [v0] Payments loaded: 6
+[00:55:25.887] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:28.897] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:28.897] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:28.897] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:28.897] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:28.897] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:28.897] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:28.897] Browser LOG     [v0] Payments loaded: 6
+[00:55:28.897] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:28.897] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:28.897] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:28.897] Browser LOG     [v0] Payments loaded: 6
+[00:55:28.897] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:31.892] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:31.892] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:31.892] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:31.892] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:31.892] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:31.892] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:31.892] Browser LOG     [v0] Payments loaded: 6
+[00:55:31.892] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:31.892] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:31.892] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:31.892] Browser LOG     [v0] Payments loaded: 6
+[00:55:31.892] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:34.899] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:34.899] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:34.899] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:34.899] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:34.899] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:34.899] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:34.899] Browser LOG     [v0] Payments loaded: 6
+[00:55:34.899] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:34.899] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:34.899] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:34.899] Browser LOG     [v0] Payments loaded: 6
+[00:55:34.899] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:37.887] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:37.887] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:37.887] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:37.887] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:37.887] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:37.887] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:37.887] Browser LOG     [v0] Payments loaded: 6
+[00:55:37.887] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:37.887] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:37.887] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:37.887] Browser LOG     [v0] Payments loaded: 6
+[00:55:37.887] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:40.891] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:40.891] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:40.891] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:40.891] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:55:40.891] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:40.891] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:40.891] Browser LOG     [v0] Payments loaded: 6
+[00:55:40.891] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:55:40.891] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:55:40.891] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:55:40.891] Browser LOG     [v0] Payments loaded: 6
+[00:55:40.891] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:56:09.891] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:56:09.891] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:56:09.891] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:56:09.891] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:56:09.891] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:56:09.891] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:56:09.891] Browser LOG     [v0] Payments loaded: 6
+[00:56:09.891] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:56:09.891] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:56:09.891] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:56:09.891] Browser LOG     [v0] Payments loaded: 6
+[00:56:09.891] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:57:09.893] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:57:09.893] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:57:09.893] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:57:09.893] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:57:09.893] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:57:09.893] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:57:09.893] Browser LOG     [v0] Payments loaded: 6
+[00:57:09.893] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:57:09.893] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:57:09.893] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:57:09.893] Browser LOG     [v0] Payments loaded: 6
+[00:57:09.893] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:58:09.896] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:58:09.896] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:58:09.896] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:58:09.896] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:58:09.896] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:58:09.896] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:58:09.896] Browser LOG     [v0] Payments loaded: 6
+[00:58:09.896] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:58:09.896] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:58:09.896] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:58:09.896] Browser LOG     [v0] Payments loaded: 6
+[00:58:09.896] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:59:09.892] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:59:09.892] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:59:09.892] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:59:09.892] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:59:09.892] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:59:09.892] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:59:09.892] Browser LOG     [v0] Payments loaded: 6
+[00:59:09.892] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[00:59:09.892] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[00:59:09.892] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[00:59:09.892] Browser LOG     [v0] Payments loaded: 6
+[00:59:09.892] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:00:09.886] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:00:09.886] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:00:09.886] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:00:09.886] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:00:09.886] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:00:09.886] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:00:09.886] Browser LOG     [v0] Payments loaded: 6
+[01:00:09.886] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:00:09.886] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:00:09.886] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:00:09.886] Browser LOG     [v0] Payments loaded: 6
+[01:00:09.886] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:01:09.890] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:01:09.890] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:01:09.890] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:01:09.890] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:01:09.890] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:01:09.890] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:01:09.890] Browser LOG     [v0] Payments loaded: 6
+[01:01:09.890] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:01:09.890] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:01:09.890] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:01:09.890] Browser LOG     [v0] Payments loaded: 6
+[01:01:09.890] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:02:09.897] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:02:09.897] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:02:09.897] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:02:09.897] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:02:09.897] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:02:09.897] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:02:09.897] Browser LOG     [v0] Payments loaded: 6
+[01:02:09.897] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:02:09.897] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:02:09.897] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:02:09.897] Browser LOG     [v0] Payments loaded: 6
+[01:02:09.897] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:03:09.890] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:03:09.890] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:03:09.890] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:03:09.890] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:03:09.890] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:03:09.890] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:03:09.890] Browser LOG     [v0] Payments loaded: 6
+[01:03:09.890] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:03:09.890] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:03:09.890] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:03:09.890] Browser LOG     [v0] Payments loaded: 6
+[01:03:09.890] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:03:59.391] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:03:59.391] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:03:59.391] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:03:59.391] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:03:59.977] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:03:59.977] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:03:59.977] Browser LOG     [v0] Payments loaded: 6
+[01:03:59.977] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:00.104] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:00.104] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:00.104] Browser LOG     [v0] Payments loaded: 6
+[01:04:00.104] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:00.873] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:00.873] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:01.029] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:01.029] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:01.029] Browser WARN    [v0] Dentist table ID not resolved; skipping payments fetch
+[01:04:01.029] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:01.029] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:01.029] Browser LOG     [v0] Payments loaded: 6
+[01:04:01.029] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:01.187] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:01.187] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:01.187] Browser LOG     [v0] Payments loaded: 6
+[01:04:01.187] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:01.600] Browser WARN    [v0] Dentist table ID not resolved; skipping payments fetch
+[01:04:03.317] Browser WARN    [v0] Dentist table ID not resolved; skipping payments fetch
+[01:04:03.884] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:03.884] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:04.011] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:04.011] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:04.011] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:04.011] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:04.011] Browser LOG     [v0] Payments loaded: 6
+[01:04:04.011] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:04.138] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:04.138] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:04.138] Browser LOG     [v0] Payments loaded: 6
+[01:04:04.138] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:06.874] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:06.874] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:07.018] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:07.018] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:07.018] Browser LOG     [v0] Payments loaded: 6
+[01:04:07.018] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:09.872] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:09.872] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:10.091] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:10.091] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:10.091] Browser LOG     [v0] Payments loaded: 6
+[01:04:10.091] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:11.192] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:11.444] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:11.444] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:11.444] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:11.679] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:11.679] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:12.874] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:12.874] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:13.127] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:13.127] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:13.127] Browser LOG     [v0] Payments loaded: 6
+[01:04:13.127] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:13.127] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:13.127] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:13.363] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:13.363] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:13.364] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:13.364] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:13.364] Browser LOG     [v0] Payments loaded: 1
+[01:04:13.364] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:13.554] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:13.554] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:13.554] Browser LOG     [v0] Payments loaded: 1
+[01:04:13.554] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:15.890] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:15.890] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:16.034] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:16.034] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:16.034] Browser LOG     [v0] Payments loaded: 6
+[01:04:16.034] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:16.359] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:16.359] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:16.539] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:16.539] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:16.539] Browser LOG     [v0] Payments loaded: 1
+[01:04:16.539] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:19.895] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:19.895] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:19.895] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:19.895] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:19.895] Browser LOG     [v0] Payments loaded: 6
+[01:04:19.895] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:20.895] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:20.895] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:20.895] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:20.895] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:20.895] Browser LOG     [v0] Payments loaded: 1
+[01:04:20.895] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:22.969] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:22.969] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:22.969] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:22.969] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:22.969] Browser LOG     [v0] Payments loaded: 6
+[01:04:22.969] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:23.884] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:23.884] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:23.884] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:23.884] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:23.884] Browser LOG     [v0] Payments loaded: 1
+[01:04:23.884] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:26.894] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:26.894] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:26.894] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:26.894] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:26.894] Browser LOG     [v0] Payments loaded: 6
+[01:04:26.894] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:26.894] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:26.894] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:26.894] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:26.894] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:26.894] Browser LOG     [v0] Payments loaded: 1
+[01:04:26.894] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:28.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:28.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:28.885] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:28.885] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:28.885] Browser LOG     [v0] Payments loaded: 6
+[01:04:28.885] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:29.884] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:29.884] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:29.884] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:29.884] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:29.884] Browser LOG     [v0] Payments loaded: 1
+[01:04:29.884] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:31.886] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:31.886] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:31.886] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:31.886] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:31.886] Browser LOG     [v0] Payments loaded: 6
+[01:04:31.886] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:32.891] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:32.891] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:32.891] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:32.891] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:32.891] Browser LOG     [v0] Payments loaded: 1
+[01:04:32.891] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:34.893] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:34.893] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:34.893] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:34.893] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:34.893] Browser LOG     [v0] Payments loaded: 6
+[01:04:34.893] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:35.883] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:35.883] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:35.883] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:35.883] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:35.883] Browser LOG     [v0] Payments loaded: 1
+[01:04:35.883] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:37.886] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:37.886] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:37.886] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:37.886] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:37.886] Browser LOG     [v0] Payments loaded: 6
+[01:04:37.886] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:38.888] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:38.888] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:38.888] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:38.888] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:38.888] Browser LOG     [v0] Payments loaded: 1
+[01:04:38.888] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:40.884] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:40.884] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:40.884] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:40.884] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:40.884] Browser LOG     [v0] Payments loaded: 6
+[01:04:40.884] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:41.895] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:41.895] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:41.895] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:41.895] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:41.895] Browser LOG     [v0] Payments loaded: 1
+[01:04:41.895] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:43.893] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:43.893] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:43.893] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:43.893] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:43.893] Browser LOG     [v0] Payments loaded: 6
+[01:04:43.893] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:44.960] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:44.960] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:44.961] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:44.961] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:44.961] Browser LOG     [v0] Payments loaded: 1
+[01:04:44.961] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:46.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:46.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:46.885] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:46.885] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:46.885] Browser LOG     [v0] Payments loaded: 6
+[01:04:46.885] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:47.888] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:47.888] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:47.888] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:47.888] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:47.888] Browser LOG     [v0] Payments loaded: 1
+[01:04:47.888] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:49.893] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:49.893] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:49.893] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:49.893] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:49.893] Browser LOG     [v0] Payments loaded: 6
+[01:04:49.893] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:50.888] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:50.888] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:50.888] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:50.888] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:50.888] Browser LOG     [v0] Payments loaded: 1
+[01:04:50.888] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:52.885] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:52.885] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:52.886] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:52.886] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:52.886] Browser LOG     [v0] Payments loaded: 6
+[01:04:52.886] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:53.892] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:53.892] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:53.892] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:53.892] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:53.892] Browser LOG     [v0] Payments loaded: 1
+[01:04:53.892] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:55.888] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:55.888] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:55.888] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:55.888] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:55.888] Browser LOG     [v0] Payments loaded: 6
+[01:04:55.888] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:56.894] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:56.894] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:56.894] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:56.894] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:56.894] Browser LOG     [v0] Payments loaded: 1
+[01:04:56.894] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:04:58.889] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:58.889] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:04:58.889] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:04:58.889] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:04:58.889] Browser LOG     [v0] Payments loaded: 6
+[01:04:58.889] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:04:59.936] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:59.936] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:04:59.936] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:04:59.936] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:04:59.936] Browser LOG     [v0] Payments loaded: 1
+[01:04:59.936] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:05:01.959] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:01.959] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:01.959] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:05:01.959] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:05:01.959] Browser LOG     [v0] Payments loaded: 6
+[01:05:01.959] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:05:02.890] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:02.890] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:02.890] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:05:02.890] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:05:02.890] Browser LOG     [v0] Payments loaded: 1
+[01:05:02.890] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:05:05.914] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:05.914] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:05.914] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:05:05.914] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:05:05.914] Browser LOG     [v0] Payments loaded: 6
+[01:05:05.914] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:05:05.914] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:05.914] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:05.914] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:05:05.914] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:05:05.914] Browser LOG     [v0] Payments loaded: 1
+[01:05:05.914] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:05:07.894] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:07.894] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:07.894] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:05:07.894] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:05:07.894] Browser LOG     [v0] Payments loaded: 6
+[01:05:07.894] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:05:08.898] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:08.898] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:08.898] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:05:08.898] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:05:08.898] Browser LOG     [v0] Payments loaded: 1
+[01:05:08.898] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:05:10.889] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:10.889] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:10.889] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:05:10.890] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:05:10.890] Browser LOG     [v0] Payments loaded: 6
+[01:05:10.890] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:05:11.889] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:11.889] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:11.889] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:05:11.889] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:05:11.889] Browser LOG     [v0] Payments loaded: 1
+[01:05:11.889] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:05:13.890] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:13.890] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:13.890] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:05:13.890] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:05:13.890] Browser LOG     [v0] Payments loaded: 6
+[01:05:13.890] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:05:14.883] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:14.883] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:14.883] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:05:14.883] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:05:14.883] Browser LOG     [v0] Payments loaded: 1
+[01:05:14.883] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:05:16.889] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:16.889] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:05:16.889] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:05:16.889] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:05:16.889] Browser LOG     [v0] Payments loaded: 6
+[01:05:16.889] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:05:17.884] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:17.884] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:05:17.884] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:05:17.884] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:05:17.884] Browser LOG     [v0] Payments loaded: 1
+[01:05:17.884] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
+[01:06:09.896] Browser LOG     [v0] Loading payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:06:09.897] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[01:06:09.897] Browser LOG     [v0] Loading payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:06:09.897] Browser LOG     [v0] 🔍 Fetching payments for dentist: 22a3092e-23e9-43f7-bf78-b0db1ba7aa1d
+[01:06:09.897] Browser LOG     [v0] ✅ Found 6 payments for dentist
+[01:06:09.897] Browser LOG     [v0] Sample payment: {"amount":100,"appointment_id":"9ba14210-1f86-48e9-a9b4-f37cb48e3a61","appointments":{"status":"paid"},"created_at":"2025-12-11T18:08:28.898732","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Root Canal Therapy (Premolar) - 2025-12-13","id":"3b080df9-2e66-4e08-b414-fba9da842abd","method":"Cash","patient_id":"f979e861-629d-47d5-b8ec-ed99f68bdec1","patients":{"email":"kentsarsalejo@gmail.com","name":"Kent Sarsalejo"},"status":"paid","updated_at":"2025-12-11T18:08:28.898732"}
+[01:06:09.897] Browser LOG     [v0] Payments loaded: 6
+[01:06:09.897] Browser LOG     [v0] Earnings data: {"count":6,"totalCompleted":6,"totalEarned":7150,"totalPending":0}
+[01:06:09.897] Browser LOG     [v0] ✅ Found 1 payments for dentist
+[01:06:09.897] Browser LOG     [v0] Sample payment: {"amount":1500,"appointment_id":null,"appointments":null,"created_at":"2025-12-08T14:44:46.796976","date":"2025-12-08","dentist_id":"22a3092e-23e9-43f7-bf78-b0db1ba7aa1d","description":"Implant Crown - Payment collected","id":"87d7c491-fda0-4aed-8858-9a670516111e","method":"cash","patient_id":"38016e67-9b80-485d-943f-245438fbfcda","patients":{"email":"chriss.olanda@hcdc.edu.ph","name":"Chriss Olanda"},"status":"paid","updated_at":"2025-12-08T14:44:46.796976"}
+[01:06:09.897] Browser LOG     [v0] Payments loaded: 1
+[01:06:09.897] Browser LOG     [v0] Earnings data: {"count":1,"totalCompleted":1,"totalEarned":1500,"totalPending":0}
