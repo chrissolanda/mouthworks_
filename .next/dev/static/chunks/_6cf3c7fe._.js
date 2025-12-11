@@ -671,12 +671,22 @@ const patientService = {
         return data;
     },
     async update (id, updates) {
-        const { data, error } = await getSupabase().from("patients").update({
-            ...updates,
-            updated_at: new Date()
-        }).eq("id", id).select().single();
-        if (error) throw error;
-        return data;
+        try {
+            const { data, error } = await getSupabase().from("patients").update({
+                ...updates,
+                updated_at: new Date()
+            }).eq("id", id).select();
+            if (error) {
+                console.error("[v0] Supabase error updating patient:", error);
+                throw new Error(`Failed to update patient: ${error.message}`);
+            }
+            // Return first result or null
+            return data && data.length > 0 ? data[0] : null;
+        } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : JSON.stringify(err);
+            console.error("[v0] Error in patientService.update():", errorMsg);
+            throw err;
+        }
     },
     async delete (id) {
         const { error } = await getSupabase().from("patients").delete().eq("id", id);
@@ -1102,11 +1112,42 @@ const treatmentRecordService = {
         return data;
     },
     async create (record) {
-        const { data, error } = await getSupabase().from("treatment_records").insert([
-            record
-        ]).select("*, treatments(name), dentists(name)").single();
-        if (error) throw error;
-        return data;
+        console.log("[v0] treatmentRecordService.create called with:", record);
+        try {
+            const { data, error } = await getSupabase().from("treatment_records").insert([
+                record
+            ]).select("*, treatments(name), dentists(name)").single();
+            if (error) {
+                console.error("[v0] ❌ Supabase error creating treatment record:", error);
+                console.error("[v0] Error code:", error.code);
+                console.error("[v0] Error message:", error.message);
+                console.error("[v0] Error details:", error.details);
+                console.error("[v0] Error hint:", error.hint);
+                throw new Error(`Failed to create treatment record: ${error.message}`);
+            }
+            console.log("[v0] ✅ Treatment record created successfully:", data);
+            return data;
+        } catch (err) {
+            console.error("[v0] ❌ Exception in treatmentRecordService.create:", err);
+            throw err;
+        }
+    },
+    async getByDentistId (dentistId) {
+        console.log("[v0] treatmentRecordService.getByDentistId called with:", dentistId);
+        try {
+            const { data, error } = await getSupabase().from("treatment_records").select("*, patients(name), treatments(name, category, price), dentists(name)").eq("dentist_id", dentistId).order("date", {
+                ascending: false
+            });
+            if (error) {
+                console.error("[v0] ❌ Error fetching treatment records:", error);
+                throw new Error(`Failed to fetch treatment records: ${error.message}`);
+            }
+            console.log("[v0] ✅ Found", data?.length || 0, "treatment records");
+            return data;
+        } catch (err) {
+            console.error("[v0] ❌ Exception in treatmentRecordService.getByDentistId:", err);
+            throw err;
+        }
     }
 };
 const supplyRequestService = {

@@ -1,37 +1,96 @@
-[00:00:00.774] Server  LOG      ✓ Ready in 534ms
-[00:18:11.657] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:18:13.193] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:18:16.361] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:37:17.564] Server  LOG      ✓ Compiled in 130ms
-[00:37:26.592] Server  LOG      ✓ Compiled in 71ms
-[00:37:27.060] Browser ERROR   ./components/auth/login-screen.tsx:248:1
-Parsing ecmascript source code failed
-  246 |     </div>
-  247 |   )
-> 248 | }
-      | ^
-  249 |
-
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-
-Import traces:
-  Client Component Browser:
-    ./components/auth/login-screen.tsx [Client Component Browser]
-    ./app/page.tsx [Client Component Browser]
-    ./app/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./components/auth/login-screen.tsx [Client Component SSR]
-    ./app/page.tsx [Client Component SSR]
-    ./app/page.tsx [Server Component]
-[00:37:56.473] Server  LOG      ✓ Compiled in 75ms
-[00:39:20.589] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:41:05.954] Server  LOG      ✓ Compiled in 132ms
-[00:41:14.855] Server  LOG      ✓ Compiled in 77ms
-[00:41:26.457] Server  LOG      ✓ Compiled in 109ms
-[00:41:33.760] Server  LOG      ✓ Compiled in 108ms
-[00:42:20.960] Server  LOG      ✓ Compiled in 117ms
-[00:42:38.444] Server  LOG      ✓ Compiled in 113ms
-[00:47:30.162] Server  LOG      ✓ Compiled in 72ms
-[00:47:47.375] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:58:33.801] Server  LOG      ✓ Compiled in 160ms
+[00:00:00.720] Server  LOG      ✓ Ready in 474ms
+[00:00:02.953] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:03.005] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:18.062] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:35.954] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:00:36.075] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:00:36.075] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:00:36.180] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:00:38.039] Browser LOG     [v0] 🔄 Starting handleSaveAndComplete...
+[00:00:38.039] Browser LOG     [v0] Selected appointment: {"created_at":"2025-12-11T18:17:33.338908","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","notes":"","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"service":"Emergency Consultation","status":"in-progress","time":"10:00","treatment_id":null,"updated_at":"2025-12-11T18:19:44.436"}
+[00:00:38.039] Browser LOG     [v0] Treatments to save: [{"name":"Deep Cleaning (SRP)","price":300,"quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}]
+[00:00:38.039] Browser LOG     [v0] Total amount: 300
+[00:00:38.039] Browser LOG     [v0] 💾 Saving treatments to treatment_records...
+[00:00:38.039] Browser LOG     [v0] Saving treatment 1/1: {"name":"Deep Cleaning (SRP)","price":300,"quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}
+[00:00:38.039] Browser LOG     [v0] Record data: {"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"Deep Cleaning (SRP) - 1x","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}
+[00:00:38.039] Browser LOG     [v0] treatmentRecordService.create called with: {"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"Deep Cleaning (SRP) - 1x","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}
+[00:00:38.150] Browser LOG     [v0] ✅ Treatment record created successfully: {"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","created_at":"2025-12-11T19:20:23.279999","date":"2025-12-26T00:00:00","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":null,"id":"3c50aab4-dad8-4663-826c-6b4e9a025bae","notes":"Deep Cleaning (SRP) - 1x","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d","treatments":{"name":"Deep Cleaning (SRP)"},"updated_at":"2025-12-11T19:20:23.279999"}
+[00:00:38.150] Browser LOG     [v0] ✅ Treatment 1 saved successfully: {"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","created_at":"2025-12-11T19:20:23.279999","date":"2025-12-26T00:00:00","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":null,"id":"3c50aab4-dad8-4663-826c-6b4e9a025bae","notes":"Deep Cleaning (SRP) - 1x","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d","treatments":{"name":"Deep Cleaning (SRP)"},"updated_at":"2025-12-11T19:20:23.279999"}
+[00:00:38.150] Browser LOG     [v0] 📝 Updating appointment status and amount...
+[00:00:47.653] Browser ERROR   [v0] Supabase error updating appointment: {"code":"PGRST204","details":null,"hint":null,"message":"Could not find the 'amount' column of 'appointments' in the schema cache"}
+[00:00:47.653] Browser ERROR   [v0] Error in appointmentService.update(): Failed to update appointment: Could not find the 'amount' column of 'appointments' in the schema cache
+[00:00:47.653] Browser ERROR   [v0] ❌ Failed to update appointment: {}
+[00:00:47.653] Browser ERROR   [v0] ❌ Error completing appointment: {}
+[00:00:47.653] Browser ERROR   [v0] Error details: {"error":{},"message":"Failed to update appointment: Could not find the 'amount' column of 'appointments' in the schema cache","stack":"Error: Failed to update appointment: Could not find the 'amount' column of 'appointments' in the schema cache\n    at Object.update (http://localhost:3000/_next/static/chunks/_45aa8c99._.js:740:23)\n    at async handleSaveAndComplete (http://localhost:3000/_next/static/chunks/_0ddce68b._.js:2617:17)\n    at async handleComplete (http://localhost:3000/_next/static/chunks/_0ddce68b._.js:1352:13)"}
+[00:00:48.031] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:00:48.159] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:00:51.016] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:00:51.144] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:00:54.027] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:00:54.515] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:00:57.517] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:00:57.517] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:01.511] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:01.511] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:04.509] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:04.509] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:07.514] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:07.514] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:10.507] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:10.507] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:13.511] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:13.511] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:16.512] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:16.512] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:19.507] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:19.507] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:21.153] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:21.374] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:25.509] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:25.509] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:28.515] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:28.515] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:30.008] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:30.191] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:34.783] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:34.915] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:34.915] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:35.069] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:36.722] Browser LOG     [v0] 🔄 Starting handleSaveAndComplete...
+[00:01:36.722] Browser LOG     [v0] Selected appointment: {"amount":0,"created_at":"2025-12-11T18:17:33.338908","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","notes":"","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"email":"chrissolanda9@gmail.com","name":"Khaizer"},"service":"Emergency Consultation","status":"in-progress","time":"10:00","treatment_id":null,"updated_at":"2025-12-11T18:19:44.436"}
+[00:01:36.722] Browser LOG     [v0] Treatments to save: [{"name":"Deep Cleaning (SRP)","price":300,"quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}]
+[00:01:36.722] Browser LOG     [v0] Total amount: 300
+[00:01:36.722] Browser LOG     [v0] 💾 Saving treatments to treatment_records...
+[00:01:36.722] Browser LOG     [v0] Saving treatment 1/1: {"name":"Deep Cleaning (SRP)","price":300,"quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}
+[00:01:36.722] Browser LOG     [v0] Record data: {"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"Deep Cleaning (SRP) - 1x","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}
+[00:01:36.722] Browser LOG     [v0] treatmentRecordService.create called with: {"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","date":"2025-12-26","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","notes":"Deep Cleaning (SRP) - 1x","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d"}
+[00:01:36.921] Browser LOG     [v0] ✅ Treatment record created successfully: {"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","created_at":"2025-12-11T19:21:22.016067","date":"2025-12-26T00:00:00","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":null,"id":"f1a7937f-051c-4d92-9e59-0cdbe070ab12","notes":"Deep Cleaning (SRP) - 1x","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d","treatments":{"name":"Deep Cleaning (SRP)"},"updated_at":"2025-12-11T19:21:22.016067"}
+[00:01:36.921] Browser LOG     [v0] ✅ Treatment 1 saved successfully: {"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","created_at":"2025-12-11T19:21:22.016067","date":"2025-12-26T00:00:00","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":null,"id":"f1a7937f-051c-4d92-9e59-0cdbe070ab12","notes":"Deep Cleaning (SRP) - 1x","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","quantity":1,"treatment_id":"5fd74e17-cd7e-4056-891d-0af7465ae64d","treatments":{"name":"Deep Cleaning (SRP)"},"updated_at":"2025-12-11T19:21:22.016067"}
+[00:01:36.921] Browser LOG     [v0] 📝 Updating appointment status and amount...
+[00:01:37.064] Browser LOG     [v0] ✅ Appointment updated successfully
+[00:01:37.064] Browser LOG     [v0] 🔄 Updating local state...
+[00:01:37.064] Browser LOG     [v0] 🎉 Showing completion modal...
+[00:01:37.064] Browser LOG     [v0] 🔄 Reloading appointments...
+[00:01:37.367] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:37.591] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:37.591] Browser LOG     [v0] ✅ All done!
+[00:01:38.129] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:38.258] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:41.012] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:41.137] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:44.513] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:44.513] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:47.518] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:47.518] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:49.762] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:49.888] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:52.817] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:52.991] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:56.000] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:56.143] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:01:58.761] Browser LOG     [v0] 🔍 Fetching payments for dentist: 17f3ac21-be52-42f7-8787-87ada66ec8d1
+[00:01:58.959] Browser LOG     [v0] ✅ Found 0 payments for dentist
+[00:02:11.706] Browser LOG     [v0] 💾 Creating payment via server API: {"amount":300,"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","description":"Emergency Consultation - 2025-12-26","method":"Cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","status":"paid"}
+[00:02:11.882] Server  LOG     [v0] 💾 Server-side payment creation: {}
+[00:02:12.421] Server  LOG     [v0] ✅ Payment created successfully: {}
+[00:02:12.539] Browser LOG     [v0] ✅ Payment saved to database successfully: {"amount":300,"appointment_id":"5655cf29-efc1-4985-8a3a-42ca7ebe4254","created_at":"2025-12-11T19:21:57.653908","date":"2025-12-11","dentist_id":"17f3ac21-be52-42f7-8787-87ada66ec8d1","dentists":{"name":"Dr. John Doe"},"description":"Emergency Consultation - 2025-12-26","id":"edebdf60-2c7a-4324-9db4-d5325fe7ba54","method":"Cash","patient_id":"137e922d-2ed9-4cdb-b36b-498ec732cc69","patients":{"name":"Khaizer"},"status":"paid","updated_at":"2025-12-11T19:21:57.653908"}

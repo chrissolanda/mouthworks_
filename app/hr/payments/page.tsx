@@ -20,9 +20,11 @@ import {
   Search,
   CheckCircle,
   AlertCircle,
+  Download,
 } from "lucide-react"
 import { paymentService, patientService } from "@/lib/db-service"
 import { formatCurrency } from "@/lib/utils"
+import { downloadReceipt, type ReceiptData } from "@/lib/receipt-generator"
 import RecordPaymentModal from "@/components/modals/record-payment-modal"
 
 interface EditingPaymentId {
@@ -112,6 +114,22 @@ export default function HRPayments() {
         alert("Error deleting payment: " + (error instanceof Error ? error.message : "Unknown error"))
       }
     }
+  }
+
+  const handleGenerateReceipt = (payment: Payment) => {
+    const patient = patients.find((p) => p.id === payment.patient_id)
+    const receiptData: ReceiptData = {
+      receiptNumber: payment.id.slice(0, 8).toUpperCase(),
+      date: payment.date ? new Date(payment.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      patientName: patient?.name || payment.patients?.name || "Unknown Patient",
+      patientEmail: patient?.email || payment.patients?.email,
+      dentistName: payment.dentists?.name || "Not Assigned",
+      service: payment.description || "Dental Service",
+      amount: payment.amount,
+      method: payment.method || "Cash",
+      notes: payment.description,
+    }
+    downloadReceipt(receiptData)
   }
 
   const handleEditPayment = async (id: string, field: string, value: any) => {
@@ -327,13 +345,22 @@ export default function HRPayments() {
                             )}
                           </td>
                           <td className="py-3 px-4">
-                            <button
-                              onClick={() => handleDeletePayment(payment.id)}
-                              className="p-1.5 hover:bg-destructive/10 rounded-lg transition-colors text-destructive"
-                              title="Delete payment"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleGenerateReceipt(payment)}
+                                className="p-1.5 hover:bg-primary/10 rounded-lg transition-colors text-primary"
+                                title="Download receipt"
+                              >
+                                <Download className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeletePayment(payment.id)}
+                                className="p-1.5 hover:bg-destructive/10 rounded-lg transition-colors text-destructive"
+                                title="Delete payment"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       )

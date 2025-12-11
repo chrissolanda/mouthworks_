@@ -2,9 +2,10 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
 import MainLayout from "@/components/layout/main-layout"
+import { patientService } from "@/lib/db-service"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +14,7 @@ import { LayoutDashboard, Calendar, User, CreditCard, Edit, Save, X } from "luci
 export default function PatientProfile() {
   const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
+  const [patientId, setPatientId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -21,6 +23,31 @@ export default function PatientProfile() {
     gender: "Male",
     address: "123 Main St, City, State 12345",
   })
+
+  // Load patient data on mount
+  useEffect(() => {
+    const loadPatientData = async () => {
+      if (user?.email) {
+        try {
+          const patient = await patientService.getByEmail(user.email)
+          if (patient) {
+            setPatientId(patient.id)
+            setFormData({
+              name: patient.name || user.name || "",
+              email: patient.email || user.email || "",
+              phone: patient.phone || user.phone || "",
+              dob: patient.dob || "1990-05-15",
+              gender: patient.gender || "Male",
+              address: patient.address || "123 Main St, City, State 12345",
+            })
+          }
+        } catch (error) {
+          console.error("Error loading patient data:", error)
+        }
+      }
+    }
+    loadPatientData()
+  }, [user?.email])
 
   const navItems = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, href: "/patient/dashboard" },
@@ -34,9 +61,36 @@ export default function PatientProfile() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSave = () => {
-    setIsEditing(false)
-    // TODO: Save to backend
+  const handleSave = async () => {
+    try {
+      if (!patientId) {
+        alert("Patient record not found. Please contact support.")
+        return
+      }
+      
+      // Update patient record
+      const updated = await patientService.update(patientId, {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        dob: formData.dob,
+        gender: formData.gender,
+        address: formData.address,
+      })
+      
+      // Update local storage user data
+      const updatedUser = { ...user, name: formData.name, email: formData.email, phone: formData.phone }
+      localStorage.setItem("user", JSON.stringify(updatedUser))
+      
+      // Update context
+      window.location.reload() // Reload to refresh auth context
+      
+      alert("✅ Profile updated successfully!")
+      setIsEditing(false)
+    } catch (error) {
+      console.error("Error updating profile:", error)
+      alert("Failed to update profile: " + (error instanceof Error ? error.message : "Unknown error"))
+    }
   }
 
   return (

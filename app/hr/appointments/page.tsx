@@ -21,9 +21,12 @@ import {
   Clock,
   UserPlus,
 } from "lucide-react"
-import { appointmentService, treatmentRecordService } from "@/lib/db-service"
+import { appointmentService, treatmentRecordService, paymentService } from "@/lib/db-service"
+import { formatCurrency } from "@/lib/utils"
 import ScheduleAppointmentModal from "@/components/modals/schedule-appointment-modal"
 import AssignDentistModal from "@/components/modals/assign-dentist-modal"
+import AppointmentPaymentModal from "@/components/modals/appointment-payment-modal"
+import AppointmentSuccessModal from "@/components/modals/appointment-success-modal"
 
 interface Appointment {
   id: string
@@ -32,7 +35,9 @@ interface Appointment {
   date: string
   time: string
   service?: string
-  status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected"
+  treatment?: string
+  amount?: number
+  status: "pending" | "confirmed" | "attended" | "in-progress" | "completed" | "paid" | "cancelled" | "rejected"
   notes?: string
   patients?: { name: string }
   dentists?: { name: string }
@@ -44,6 +49,9 @@ export default function HRAppointments() {
   const [loading, setLoading] = useState(true)
   const [showScheduleModal, setShowScheduleModal] = useState(false)
   const [showAssignModal, setShowAssignModal] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successAppointment, setSuccessAppointment] = useState<any>(null)
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
   const [filter, setFilter] = useState("all")
 
@@ -81,7 +89,16 @@ export default function HRAppointments() {
       console.log("[v0] ✅ Appointment created successfully:", newAppointment)
       setAppointments([newAppointment, ...appointments])
       setShowScheduleModal(false)
-      alert(`✅ Appointment created successfully!\n\nPatient: ${data.patient_name || "Unknown"}\nDentist: ${data.dentist_name || "Assigned"}\nDate: ${data.date}\nTime: ${data.time}\nService: ${data.service || "Not specified"}`)
+      
+      // Show success modal instead of alert
+      setSuccessAppointment({
+        patient_name: data.patient_name,
+        dentist_name: data.dentist_name,
+        date: data.date,
+        time: data.time,
+        service: data.service,
+      })
+      setShowSuccessModal(true)
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : JSON.stringify(error)
       console.error("[v0] Error scheduling appointment:", errorMsg)
@@ -145,12 +162,58 @@ export default function HRAppointments() {
     setShowAssignModal(true)
   }
 
+  const handleRecordPayment = async (paymentData: { method: string; amount: number; notes: string }): Promise<string> => {
+    if (!selectedAppointment) return ""
+    
+    try {
+      // Create payment record
+      const payment = await paymentService.create({
+        patient_id: selectedAppointment.patient_id,
+        dentist_id: selectedAppointment.dentist_id || "",
+        appointment_id: selectedAppointment.id,
+        amount: paymentData.amount,
+        method: paymentData.method,
+        status: "paid",
+        description: paymentData.notes,
+        date: new Date().toISOString().split("T")[0],
+      })
+      
+      // Update appointment status to "paid"
+      await appointmentService.update(selectedAppointment.id, {
+        status: "paid",
+      })
+      
+      // Reload appointments to reflect the change
+      await loadAppointments()
+      
+      // Return payment ID for receipt generation
+      return payment.id
+    } catch (error) {
+      console.error("[v0] Error recording payment:", error)
+      throw new Error("Failed to record payment: " + (error instanceof Error ? error.message : "Unknown error"))
+    }
+  }
+
+  const handleMarkAttended = async (appointmentId: string) => {
+    try {
+      await appointmentService.update(appointmentId, { status: "attended" })
+      await loadAppointments()
+      console.log("[v0] ✅ Appointment marked as attended")
+    } catch (error) {
+      console.error("[v0] Error marking as attended:", error)
+      alert("Failed to mark appointment as attended")
+    }
+  }
+
   const filteredAppointments = filter === "all" ? appointments : appointments.filter((a) => a.status === filter)
 
   const statusGroups = {
     pending: filteredAppointments.filter((a) => a.status === "pending"),
     confirmed: filteredAppointments.filter((a) => a.status === "confirmed"),
+    attended: filteredAppointments.filter((a) => a.status === "attended"),
+    inProgress: filteredAppointments.filter((a) => a.status === "in-progress"),
     completed: filteredAppointments.filter((a) => a.status === "completed"),
+    paid: filteredAppointments.filter((a) => a.status === "paid"),
   }
 
   return (
@@ -170,6 +233,157 @@ export default function HRAppointments() {
             New Appointment
           </Button>
         </div>
+
+        {/* COMPLETED APPOINTMENTS - AWAITING PAYMENT */}
+        {statusGroups.completed.length > 0 && (
+          <Card className="border-green-300 bg-green-50/50 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-green-900">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                Completed Appointments - Ready for Payment ({statusGroups.completed.length})
+              </CardTitle>
+              <p className="text-sm text-green-700">Click on any appointment to record payment</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {statusGroups.completed.map((apt) => (
+                  <button
+                    key={apt.id}
+                    onClick={() => {
+                      setSelectedAppointment(apt)
+                      setShowPaymentModal(true)
+                    }}
+                    className="p-5 border-2 border-green-300 bg-white rounded-lg hover:bg-green-50 hover:border-green-500 transition-all text-left group"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <p className="font-bold text-lg text-foreground group-hover:text-primary">
+                          {apt.patients?.name || "Unknown Patient"}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          <span className="font-medium">{apt.service || "General Visit"}</span>
+                          {apt.dentists?.name && ` • Dr. ${apt.dentists.name}`}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-primary">{apt.date}</p>
+                        <p className="text-sm text-muted-foreground">{apt.time}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-3 border-t border-green-200">
+                      <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-1 rounded">
+                        ✓ COMPLETED
+                      </span>
+                      <span className="text-sm font-bold text-primary group-hover:underline">
+                        Record Payment →
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* PAID APPOINTMENTS */}
+        {statusGroups.paid.length > 0 && (
+          <Card className="border-blue-300 bg-blue-50/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-900">
+                <CreditCard className="w-5 h-5 text-blue-600" />
+                Paid Appointments ({statusGroups.paid.length})
+              </CardTitle>
+              <p className="text-sm text-blue-700">Appointments with recorded payments</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {statusGroups.paid.map((apt) => (
+                  <div
+                    key={apt.id}
+                    className="p-5 border-2 border-blue-200 bg-white rounded-lg"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <p className="font-bold text-lg text-foreground">
+                          {apt.patients?.name || "Unknown Patient"}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          <span className="font-medium">{apt.service || "General Visit"}</span>
+                          {apt.dentists?.name && ` • Dr. ${apt.dentists.name}`}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-primary">{apt.date}</p>
+                        <p className="text-sm text-muted-foreground">{apt.time}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-3 border-t border-blue-200">
+                      <span className="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-1 rounded">
+                        ✓ PAID
+                      </span>
+                      {apt.amount && (
+                        <span className="text-sm font-bold text-blue-900">
+                          {formatCurrency(apt.amount)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* CONFIRMED APPOINTMENTS - PATIENT CHECK-IN */}
+        {statusGroups.confirmed.length > 0 && (
+          <Card className="border-purple-300 bg-purple-50/50 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-purple-900">
+                <CheckCircle className="w-5 h-5 text-purple-600" />
+                Confirmed Appointments - Patient Check-In ({statusGroups.confirmed.length})
+              </CardTitle>
+              <p className="text-sm text-purple-700">Mark patients as attended when they arrive</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {statusGroups.confirmed.map((apt) => (
+                  <div
+                    key={apt.id}
+                    className="p-5 border-2 border-purple-300 bg-white rounded-lg"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <p className="font-bold text-lg text-foreground">
+                          {apt.patients?.name || "Unknown Patient"}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          <span className="font-medium">{apt.service || "General Visit"}</span>
+                          {apt.dentists?.name && ` • Dr. ${apt.dentists.name}`}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-primary">{apt.date}</p>
+                        <p className="text-sm text-muted-foreground">{apt.time}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 pt-3 border-t border-purple-200">
+                      <span className="text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-1 rounded flex-1">
+                        ✓ CONFIRMED
+                      </span>
+                      <Button
+                        onClick={() => handleMarkAttended(apt.id)}
+                        size="sm"
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                      >
+                        Mark Attended
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* PATIENT BOOKING REQUESTS - HIGHLIGHTED */}
         {statusGroups.pending.length > 0 && (
@@ -250,7 +464,7 @@ export default function HRAppointments() {
 
         {/* Status Filters */}
         <div className="flex gap-2">
-          {["all", "pending", "confirmed", "completed"].map((status) => (
+          {["all", "pending", "confirmed", "completed", "paid"].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
@@ -368,11 +582,32 @@ export default function HRAppointments() {
         <ScheduleAppointmentModal onClose={() => setShowScheduleModal(false)} onSubmit={handleScheduleAppointment} />
       )}
 
+      {showSuccessModal && successAppointment && (
+        <AppointmentSuccessModal
+          appointment={successAppointment}
+          onClose={() => {
+            setShowSuccessModal(false)
+            setSuccessAppointment(null)
+          }}
+        />
+      )}
+
       {showAssignModal && selectedAppointment && (
         <AssignDentistModal
           appointment={selectedAppointment}
           onClose={() => setShowAssignModal(false)}
           onAssign={handleAssignDentist}
+        />
+      )}
+
+      {showPaymentModal && selectedAppointment && (
+        <AppointmentPaymentModal
+          appointment={selectedAppointment}
+          onClose={() => {
+            setShowPaymentModal(false)
+            setSelectedAppointment(null)
+          }}
+          onRecordPayment={handleRecordPayment}
         />
       )}
     </MainLayout>

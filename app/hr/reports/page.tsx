@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
 import MainLayout from "@/components/layout/main-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,11 +16,52 @@ import {
   Download,
   TrendingUp,
 } from "lucide-react"
-import { mockAppointments, mockPayments } from "@/components/data/mock-data"
+import { appointmentService, paymentService } from "@/lib/db-service"
 import { formatCurrency } from "@/lib/utils"
+
+interface Appointment {
+  id: string
+  status: string
+  service?: string
+  [key: string]: any
+}
+
+interface Payment {
+  id: string
+  amount: number
+  status: string
+  [key: string]: any
+}
 
 export default function HRReports() {
   const { user } = useAuth()
+  const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [payments, setPayments] = useState<Payment[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadData()
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(() => {
+      loadData()
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const loadData = async () => {
+    try {
+      const [appointmentsData, paymentsData] = await Promise.all([
+        appointmentService.getAll(),
+        paymentService.getAll(),
+      ])
+      setAppointments(appointmentsData || [])
+      setPayments(paymentsData || [])
+    } catch (error) {
+      console.error("[v0] Error loading reports data:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const navItems = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, href: "/hr/dashboard" },
@@ -33,22 +75,25 @@ export default function HRReports() {
   ]
 
   const appointmentStats = {
-    total: mockAppointments.length,
-    completed: mockAppointments.filter((a) => a.status === "completed").length,
-    pending: mockAppointments.filter((a) => a.status === "pending").length,
-    confirmed: mockAppointments.filter((a) => a.status === "confirmed").length,
+    total: appointments.length,
+    completed: appointments.filter((a) => a.status === "completed" || a.status === "paid").length,
+    pending: appointments.filter((a) => a.status === "pending").length,
+    confirmed: appointments.filter((a) => a.status === "confirmed").length,
   }
 
   const paymentStats = {
-    totalRevenue: mockPayments.filter((p) => p.status === "paid").reduce((sum, p) => sum + p.amount, 0),
-    totalPending: mockPayments.filter((p) => p.status === "unpaid").reduce((sum, p) => sum + p.amount, 0),
-    totalPartial: mockPayments.filter((p) => p.status === "partial").reduce((sum, p) => sum + p.amount, 0),
+    totalRevenue: payments.filter((p) => p.status === "paid").reduce((sum, p) => sum + p.amount, 0),
+    totalPending: payments.filter((p) => p.status === "unpaid").reduce((sum, p) => sum + p.amount, 0),
+    totalPartial: payments.filter((p) => p.status === "partial").reduce((sum, p) => sum + p.amount, 0),
   }
 
-  const treatmentCounts = mockAppointments.reduce(
+  const treatmentCounts = appointments.reduce(
     (acc, apt) => {
-      const count = acc[apt.service] || 0
-      return { ...acc, [apt.service]: count + 1 }
+      if (apt.service) {
+        const count = acc[apt.service] || 0
+        return { ...acc, [apt.service]: count + 1 }
+      }
+      return acc
     },
     {} as Record<string, number>,
   )
@@ -62,8 +107,12 @@ export default function HRReports() {
           <p className="text-muted-foreground">View analytics and performance metrics</p>
         </div>
 
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {loading ? (
+          <div className="py-8 text-center text-muted-foreground">Loading reports data...</div>
+        ) : (
+          <>
+            {/* Key Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
@@ -217,6 +266,8 @@ export default function HRReports() {
             </div>
           </CardContent>
         </Card>
+          </>
+        )}
       </div>
     </MainLayout>
   )

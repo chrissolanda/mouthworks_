@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { LayoutDashboard, Calendar, Bluetooth as Tooth, BarChart3, CheckCircle, XCircle, DollarSign } from "lucide-react"
 import { useState, useEffect } from "react"
-import { appointmentService, dentistService, paymentService, treatmentService } from "@/lib/db-service"
-import CollectPaymentModal from "@/components/modals/collect-payment-modal"
+import { appointmentService, dentistService, paymentService, treatmentRecordService } from "@/lib/db-service"
+import AppointmentTreatmentModal from "@/components/modals/appointment-treatment-modal"
+import AppointmentCompleteModal from "@/components/modals/appointment-complete-modal"
 
 interface Appointment {
   id: string
@@ -15,7 +16,7 @@ interface Appointment {
   dentist_id: string
   date: string
   time: string
-  status: string
+  status: "pending" | "confirmed" | "attended" | "in-progress" | "completed" | "paid" | "cancelled" | "rejected"
   treatment_id?: string
   service?: string
   treatment?: string
@@ -37,10 +38,12 @@ export default function DentistDashboard() {
   const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState<string | null>(null)
   const [showCollectModal, setShowCollectModal] = useState(false)
+  const [showTreatmentModal, setShowTreatmentModal] = useState(false)
+  const [showCompleteModal, setShowCompleteModal] = useState(false)
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
-  const [calculatedAmount, setCalculatedAmount] = useState(0)
+  const [treatmentCount, setTreatmentCount] = useState(0)
   const [stats, setStats] = useState({
-    totalAppointments: 0,
+    appointments: 0,
     completed: 0,
     pending: 0,
     earnings: 0,
@@ -98,7 +101,7 @@ export default function DentistDashboard() {
           .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
         
         setStats({
-          totalAppointments: (data || []).length,
+          appointments: (data || []).length,
           completed,
           pending,
           earnings: totalEarnings,
@@ -106,7 +109,7 @@ export default function DentistDashboard() {
       } catch (err) {
         console.log("[v0] Could not load earnings from payments (this is OK):", err)
         setStats({
-          totalAppointments: (data || []).length,
+          appointments: (data || []).length,
           completed,
           pending,
           earnings: 0,
@@ -132,119 +135,6 @@ export default function DentistDashboard() {
     }
   }
 
-  const handleCompleteAppointment = async (appointment: Appointment) => {
-    setProcessingId(appointment.id)
-    try {
-      // Mark appointment as completed first
-      await appointmentService.changeStatus(appointment.id, "completed")
-      setAppointments((prev) => prev.map((apt) => (apt.id === appointment.id ? { ...apt, status: "completed" } : apt)))
-      
-      // Calculate price
-      let amount = appointment.amount || 0
-      
-      // Try to get price from treatment_id
-      if (!amount && appointment.treatment_id) {
-        try {
-          const treatment = await treatmentService.getById(appointment.treatment_id)
-          amount = treatment?.price || 0
-        } catch (e) {
-          console.warn("[v0] Could not resolve treatment by id:", e)
-        }
-      }
-      
-      // Try to match by service name
-      if (!amount) {
-        try {
-          const treatments = await treatmentService.getAll()
-          const matched = (treatments || []).find((t: any) => t.name === (appointment.service || appointment.treatment))
-          amount = matched?.price || 0
-        } catch (e) {
-          console.warn("[v0] Could not lookup treatments:", e)
-        }
-      }
-      
-      // Use default prices based on service name
-      if (!amount) {
-        const defaultPrices: Record<string, number> = {
-          "Cleaning": 500, "Tooth Cleaning": 500, "Dental Cleaning": 500,
-          "Filling": 800, "Dental Filling": 800, "Tooth Filling": 800,
-          "Root Canal": 1500, "Root Canal Treatment": 1500,
-          "Extraction": 600, "Tooth Extraction": 600,
-          "Whitening": 2000, "Teeth Whitening": 2000,
-          "Checkup": 300, "Dental Checkup": 300, "Consultation": 300,
-          "Braces": 3000, "Dental Braces": 3000,
-          "Crown": 2500, "Dental Crown": 2500,
-        }
-        amount = defaultPrices[appointment.service] || 500
-      }
-      
-      console.log("[v0] Calculated amount:", amount, "for service:", appointment.service)
-      
-      // Show collect payment modal
-      setSelectedAppointment(appointment)
-      setCalculatedAmount(amount)
-      setShowCollectModal(true)
-    } catch (error) {
-      console.error("[v0] Error completing appointment:", error)
-      alert("Failed to complete appointment")
-    } finally {
-      setProcessingId(null)
-    }
-  }
-
-  const handleCollectPayment = async (paymentData: { method: string; amount: number; notes?: string }) => {
-    if (!selectedAppointment) return
-
-    try {
-      console.log("[v0] Collecting payment:", paymentData)
-      
-      const paymentPayload = {
-        patient_id: selectedAppointment.patient_id,
-        dentist_id: typeof selectedAppointment.dentist_id === "string" ? selectedAppointment.dentist_id : dentistTableId,
-        appointment_id: selectedAppointment.id,
-        amount: paymentData.amount,
-        method: paymentData.method,
-        status: "paid",
-        description: `${selectedAppointment.service || "treatment"} - ${paymentData.notes || "Payment collected"}`,
-        date: new Date().toISOString().split("T")[0],
-      }
-      
-      const dentistId = typeof paymentPayload.dentist_id === "string" ? paymentPayload.dentist_id : null
-      if (!dentistId) {
-        console.error("[v0] Missing dentist_id when collecting payment from dashboard")
-        alert("Cannot record payment: dentist id is missing. Please reopen after reloading your dashboard.")
-        return
-      }
-
-      paymentPayload.dentist_id = dentistId
-
-      const createdPayment = await paymentService.create(paymentPayload)
-      console.log("[v0] ✅ Payment saved to database:", createdPayment)
-      
-      // Close modal and show success
-      setShowCollectModal(false)
-      setSelectedAppointment(null)
-      
-      alert(
-        `✅ PAYMENT COLLECTED SUCCESSFULLY!\n\n` +
-        `💵 Amount: ₱${paymentData.amount.toLocaleString()}\n` +
-        `💳 Method: ${paymentData.method.replace(/_/g, " ").toUpperCase()}\n` +
-        `👨‍⚕️ Your Share (50%): ₱${(paymentData.amount * 0.5).toLocaleString()}\n\n` +
-        `📊 Payment ID: ${createdPayment.id}\n\n` +
-        `✓ Recorded in database\n` +
-        `✓ Will appear in your Earnings\n` +
-        `✓ Visible to HR in Payments section`
-      )
-      
-      // Reload appointments to update stats
-      loadAppointments()
-    } catch (error) {
-      console.error("[v0] Error recording payment:", error)
-      const errorMsg = error instanceof Error ? error.message : String(error)
-      alert(`❌ Payment collection failed!\n\nError: ${errorMsg}\n\nPlease try again or contact support.`)
-    }
-  }
-
   const handleRejectAppointment = async (appointmentId: string) => {
     setProcessingId(appointmentId)
     try {
@@ -258,10 +148,110 @@ export default function DentistDashboard() {
     }
   }
 
+  const handleStartProcedure = async (appointment: Appointment) => {
+    setProcessingId(appointment.id)
+    try {
+      await appointmentService.changeStatus(appointment.id, "in-progress")
+      setAppointments((prev) => prev.map((apt) => (apt.id === appointment.id ? { ...apt, status: "in-progress" } : apt)))
+      
+      // Open treatment modal
+      setSelectedAppointment(appointment)
+      setShowTreatmentModal(true)
+    } catch (error) {
+      console.error("[v0] Error starting procedure:", error)
+      alert("Failed to start procedure")
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
+  const handleSaveAndComplete = async (treatments: any[], totalAmount: number) => {
+    if (!selectedAppointment) {
+      console.error("[v0] No appointment selected")
+      alert("Error: No appointment selected")
+      return
+    }
+    
+    console.log("[v0] 🔄 Starting handleSaveAndComplete...")
+    console.log("[v0] Selected appointment:", selectedAppointment)
+    console.log("[v0] Treatments to save:", treatments)
+    console.log("[v0] Total amount:", totalAmount)
+    
+    try {
+      // Save treatments to treatment_records
+      console.log("[v0] 💾 Saving treatments to treatment_records...")
+      for (let i = 0; i < treatments.length; i++) {
+        const treatment = treatments[i]
+        console.log(`[v0] Saving treatment ${i + 1}/${treatments.length}:`, treatment)
+        
+        const recordData = {
+          patient_id: selectedAppointment.patient_id,
+          dentist_id: selectedAppointment.dentist_id,
+          appointment_id: selectedAppointment.id,
+          treatment_id: treatment.treatment_id,
+          date: selectedAppointment.date,
+          quantity: treatment.quantity,
+          notes: `${treatment.name} - ${treatment.quantity}x`,
+        }
+        console.log("[v0] Record data:", recordData)
+        
+        try {
+          const result = await treatmentRecordService.create(recordData)
+          console.log(`[v0] ✅ Treatment ${i + 1} saved successfully:`, result)
+        } catch (treatmentError) {
+          console.error(`[v0] ❌ Failed to save treatment ${i + 1}:`, treatmentError)
+          throw treatmentError
+        }
+      }
+      
+      // Update appointment with total amount and mark as completed
+      console.log("[v0] 📝 Updating appointment status and amount...")
+      try {
+        await appointmentService.update(selectedAppointment.id, {
+          status: "completed",
+          amount: totalAmount,
+        })
+        console.log("[v0] ✅ Appointment updated successfully")
+      } catch (updateError) {
+        console.error("[v0] ❌ Failed to update appointment:", updateError)
+        throw updateError
+      }
+      
+      // Update local state
+      console.log("[v0] 🔄 Updating local state...")
+      setAppointments((prev) => 
+        prev.map((apt) => 
+          apt.id === selectedAppointment.id 
+            ? { ...apt, status: "completed", amount: totalAmount } 
+            : apt
+        )
+      )
+      
+      // Close treatment modal and show completion modal
+      console.log("[v0] 🎉 Showing completion modal...")
+      setShowTreatmentModal(false)
+      setTreatmentCount(treatments.length)
+      setShowCompleteModal(true)
+      
+      // Reload appointments
+      console.log("[v0] 🔄 Reloading appointments...")
+      await loadData()
+      console.log("[v0] ✅ All done!")
+    } catch (error) {
+      console.error("[v0] ❌ Error completing appointment:", error)
+      console.error("[v0] Error details:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        error: error
+      })
+      alert("Failed to complete appointment: " + (error instanceof Error ? error.message : "Unknown error"))
+    }
+  }
+
 
 
   const pendingAppointments = appointments.filter((apt) => apt.status === "pending")
-  const approvedAppointments = appointments.filter((apt) => apt.status === "confirmed" || apt.status === "attended")
+  const approvedAppointments = appointments.filter((apt) => apt.status === "confirmed" || apt.status === "attended" || apt.status === "in-progress")
   const todayAppointments = approvedAppointments.filter((apt) => {
     const today = new Date().toISOString().split("T")[0]
     return apt.date === today
@@ -414,20 +404,48 @@ export default function DentistDashboard() {
                           {apt.date} at {apt.time}
                         </p>
                         {apt.status === "attended" && (
-                          <p className="text-xs text-blue-600">Patient marked as attended</p>
+                          <p className="text-xs text-blue-600 font-semibold">✓ Patient marked as attended - Ready to start</p>
+                        )}
+                        {apt.status === "in-progress" && (
+                          <p className="text-xs text-orange-600 font-semibold">⚡ Procedure in progress</p>
                         )}
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleCompleteAppointment(apt)}
-                        disabled={processingId === apt.id}
-                      >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        {processingId === apt.id ? "..." : "Complete"}
-                      </Button>
+                      {apt.status === "attended" && (
+                        <Button
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                          onClick={() => handleStartProcedure(apt)}
+                          disabled={processingId === apt.id}
+                        >
+                          <Tooth className="w-4 h-4 mr-1" />
+                          {processingId === apt.id ? "..." : "Start Procedure"}
+                        </Button>
+                      )}
+                      {apt.status === "in-progress" && (
+                        <Button
+                          size="sm"
+                          className="bg-orange-600 hover:bg-orange-700 text-white"
+                          onClick={() => {
+                            setSelectedAppointment(apt)
+                            setShowTreatmentModal(true)
+                          }}
+                          disabled={processingId === apt.id}
+                        >
+                          <Tooth className="w-4 h-4 mr-1" />
+                          {processingId === apt.id ? "..." : "Add Treatments"}
+                        </Button>
+                      )}
+                      {apt.status === "confirmed" && (
+                        <Button
+                          size="sm"
+                          className="bg-gray-400 text-white cursor-not-allowed"
+                          disabled
+                        >
+                          Waiting for Patient Check-in
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -467,22 +485,29 @@ export default function DentistDashboard() {
 
       </div>
 
-      {/* Collect Payment Modal */}
-      {selectedAppointment && (
-        <CollectPaymentModal
-          open={showCollectModal}
+      {/* Modals */}
+      {showTreatmentModal && selectedAppointment && (
+        <AppointmentTreatmentModal
+          appointment={selectedAppointment}
           onClose={() => {
-            setShowCollectModal(false)
+            setShowTreatmentModal(false)
             setSelectedAppointment(null)
           }}
-          onCollect={handleCollectPayment}
-          appointmentData={{
-            patientName: selectedAppointment.patients?.name || "Unknown Patient",
-            service: selectedAppointment.service || "Treatment",
-            suggestedAmount: calculatedAmount,
+          onSaveAndComplete={handleSaveAndComplete}
+        />
+      )}
+
+      {showCompleteModal && selectedAppointment && (
+        <AppointmentCompleteModal
+          appointment={selectedAppointment}
+          treatmentCount={treatmentCount}
+          onClose={() => {
+            setShowCompleteModal(false)
+            setSelectedAppointment(null)
           }}
         />
       )}
+
     </MainLayout>
   )
 }

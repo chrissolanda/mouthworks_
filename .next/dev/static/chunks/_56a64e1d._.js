@@ -640,12 +640,21 @@ const patientService = {
         return data;
     },
     async update (id, updates) {
-        const { data, error } = await getSupabase().from("patients").update({
-            ...updates,
-            updated_at: new Date()
-        }).eq("id", id).select().single();
-        if (error) throw error;
-        return data;
+        try {
+            const { data, error } = await getSupabase().from("patients").update({
+                ...updates,
+                updated_at: new Date()
+            }).eq("id", id).select().single();
+            if (error) {
+                console.error("[v0] Supabase error updating patient:", error);
+                throw new Error(`Failed to update patient: ${error.message}`);
+            }
+            return data;
+        } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : JSON.stringify(err);
+            console.error("[v0] Error in patientService.update():", errorMsg);
+            throw err;
+        }
     },
     async delete (id) {
         const { error } = await getSupabase().from("patients").delete().eq("id", id);
@@ -813,15 +822,34 @@ const paymentService = {
     },
     async getByDentistId (dentistId) {
         try {
-            console.log("[v0] Fetching payments for dentist:", dentistId);
+            console.log("[v0] 🔍 Fetching payments for dentist:", dentistId);
+            if (typeof dentistId !== "string" || dentistId.length === 0) {
+                console.error("[v0] ❌ dentistId missing or not a string", dentistId);
+                return [];
+            }
+            const uuidRegex = /^[0-9a-fA-F-]{36}$/;
+            if (!uuidRegex.test(dentistId)) {
+                console.error("[v0] ❌ dentistId is not a valid UUID", dentistId);
+                return [];
+            }
             const { data, error } = await getSupabase().from("payments").select("*, patients(name, email), appointments(status)").eq("dentist_id", dentistId).order("date", {
                 ascending: false
             });
             if (error) {
-                console.error("[v0] Error fetching dentist payments:", error.message);
+                console.error("[v0] ❌ Error fetching dentist payments:", error);
+                console.error("[v0] Error code:", error.code);
+                console.error("[v0] Error message:", error.message);
+                console.error("[v0] Error details:", error.details);
+                if (error.code === "42703") {
+                    console.error("[v0] 🚨 COLUMN DOES NOT EXIST! You need to run the SQL migration:");
+                    console.error("[v0] ALTER TABLE payments ADD COLUMN IF NOT EXISTS dentist_id UUID REFERENCES dentists(id);");
+                }
                 return [];
             }
-            console.log("[v0] Found", data?.length || 0, "payments for dentist");
+            console.log("[v0] ✅ Found", data?.length || 0, "payments for dentist");
+            if (data && data.length > 0) {
+                console.log("[v0] Sample payment:", data[0]);
+            }
             return data || [];
         } catch (err) {
             console.error("[v0] Exception fetching dentist payments:", err instanceof Error ? err.message : err);
@@ -902,10 +930,18 @@ const paymentService = {
     },
     async getDentistEarnings (dentistId) {
         try {
-            console.log("[v0] Fetching earnings for dentist:", dentistId);
+            console.log("[v0] 💰 Fetching earnings for dentist:", dentistId);
             const { data, error } = await getSupabase().from("payments").select("amount, status, appointment_id, appointments(status)").eq("dentist_id", dentistId);
             if (error) {
-                console.error("[v0] Error fetching dentist earnings:", error.message);
+                console.error("[v0] ❌ Error fetching dentist earnings:", error);
+                console.error("[v0] Error code:", error.code);
+                console.error("[v0] Error message:", error.message);
+                if (error.code === "42703") {
+                    console.error("[v0] 🚨 COLUMN 'dentist_id' DOES NOT EXIST!");
+                    console.error("[v0] 📋 RUN THIS SQL IN SUPABASE:");
+                    console.error("[v0] ALTER TABLE payments ADD COLUMN IF NOT EXISTS dentist_id UUID REFERENCES dentists(id);");
+                    console.error("[v0] CREATE INDEX IF NOT EXISTS idx_payments_dentist_id ON payments(dentist_id);");
+                }
                 return {
                     totalEarned: 0,
                     totalPending: 0,
@@ -913,9 +949,9 @@ const paymentService = {
                     count: 0
                 };
             }
-            console.log("[v0] Found", data?.length || 0, "payments for dentist");
+            console.log("[v0] ✅ Found", data?.length || 0, "payment records for dentist");
             if (data && data.length > 0) {
-                console.log("[v0] Sample payment:", data[0]);
+                console.log("[v0] Sample payment record:", data[0]);
             }
             let totalEarned = 0;
             let totalPending = 0;
@@ -1179,9 +1215,29 @@ function DentistDashboard() {
     const [dentistTableId, setDentistTableId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [processingId, setProcessingId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [showCollectModal, setShowCollectModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [showTreatmentModal, setShowTreatmentModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [showCompleteModal, setShowCompleteModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [selectedAppointment, setSelectedAppointment] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [treatmentCount, setTreatmentCount] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
+    const [stats, setStats] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
+        appointments: 0,
+        completed: 0,
+        pending: 0,
+        earnings: 0
+    });
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "DentistDashboard.useEffect": ()=>{
             loadData();
+            // Auto-refresh every 3 seconds to show new payments
+            const interval = setInterval({
+                "DentistDashboard.useEffect.interval": ()=>{
+                    loadData();
+                }
+            }["DentistDashboard.useEffect.interval"], 3000);
+            return ({
+                "DentistDashboard.useEffect": ()=>clearInterval(interval)
+            })["DentistDashboard.useEffect"];
         }
     }["DentistDashboard.useEffect"], [
         user?.email
@@ -1213,6 +1269,28 @@ function DentistDashboard() {
             setLoading(true);
             const data = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["appointmentService"].getByDentistId(idToUse);
             setAppointments(data || []);
+            // Calculate stats
+            const completed = (data || []).filter((a)=>a.status === "completed").length;
+            const pending = (data || []).filter((a)=>a.status === "pending").length;
+            // Load earnings from payments
+            try {
+                const payments = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["paymentService"].getByDentistId(idToUse);
+                const totalEarnings = (payments || []).filter((p)=>p.status === "paid" || p.status === "partial").reduce((sum, p)=>sum + (p.amount || 0), 0);
+                setStats({
+                    appointments: (data || []).length,
+                    completed,
+                    pending,
+                    earnings: totalEarnings
+                });
+            } catch (err) {
+                console.log("[v0] Could not load earnings from payments (this is OK):", err);
+                setStats({
+                    appointments: (data || []).length,
+                    completed,
+                    pending,
+                    earnings: 0
+                });
+            }
         } catch (error) {
             console.error("[v0] Error loading appointments:", error);
         } finally{
@@ -1237,96 +1315,21 @@ function DentistDashboard() {
     const handleCompleteAppointment = async (appointment)=>{
         setProcessingId(appointment.id);
         try {
-            // Mark appointment as completed first
+            // Mark appointment as completed
             await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["appointmentService"].changeStatus(appointment.id, "completed");
             setAppointments((prev)=>prev.map((apt)=>apt.id === appointment.id ? {
                         ...apt,
                         status: "completed"
                     } : apt));
-            // Calculate price
-            let amount = appointment.amount || 0;
-            // Try to get price from treatment_id
-            if (!amount && appointment.treatment_id) {
-                try {
-                    const treatment = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["treatmentService"].getById(appointment.treatment_id);
-                    amount = treatment?.price || 0;
-                } catch (e) {
-                    console.warn("[v0] Could not resolve treatment by id:", e);
-                }
-            }
-            // Try to match by service name
-            if (!amount) {
-                try {
-                    const treatments = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["treatmentService"].getAll();
-                    const matched = (treatments || []).find((t)=>t.name === (appointment.service || appointment.treatment));
-                    amount = matched?.price || 0;
-                } catch (e) {
-                    console.warn("[v0] Could not lookup treatments:", e);
-                }
-            }
-            // Use default prices based on service name
-            if (!amount) {
-                const defaultPrices = {
-                    "Cleaning": 500,
-                    "Tooth Cleaning": 500,
-                    "Dental Cleaning": 500,
-                    "Filling": 800,
-                    "Dental Filling": 800,
-                    "Tooth Filling": 800,
-                    "Root Canal": 1500,
-                    "Root Canal Treatment": 1500,
-                    "Extraction": 600,
-                    "Tooth Extraction": 600,
-                    "Whitening": 2000,
-                    "Teeth Whitening": 2000,
-                    "Checkup": 300,
-                    "Dental Checkup": 300,
-                    "Consultation": 300,
-                    "Braces": 3000,
-                    "Dental Braces": 3000,
-                    "Crown": 2500,
-                    "Dental Crown": 2500
-                };
-                amount = defaultPrices[appointment.service] || 500;
-            }
-            console.log("[v0] Calculated amount:", amount, "for service:", appointment.service);
-            // Show collect payment modal
-            setSelectedAppointment(appointment);
-            setCalculatedAmount(amount);
-            setShowCollectModal(true);
+            // Show message to direct to HR for payment
+            alert(`✅ APPOINTMENT COMPLETED!\n\n` + `Patient: ${appointment.patients?.name || "Unknown"}\n` + `Service: ${appointment.service || "Treatment"}\n\n` + `📋 Next Step:\n` + `Please inform the HR/Admin staff to record the payment for this completed appointment.\n\n` + `The HR team will handle payment collection and recording.`);
+            // Reload appointments
+            await loadAppointments();
         } catch (error) {
             console.error("[v0] Error completing appointment:", error);
             alert("Failed to complete appointment");
         } finally{
             setProcessingId(null);
-        }
-    };
-    const handleCollectPayment = async (paymentData)=>{
-        if (!selectedAppointment) return;
-        try {
-            console.log("[v0] Collecting payment:", paymentData);
-            const paymentPayload = {
-                patient_id: selectedAppointment.patient_id,
-                dentist_id: selectedAppointment.dentist_id,
-                appointment_id: selectedAppointment.id,
-                amount: paymentData.amount,
-                method: paymentData.method,
-                status: "paid",
-                description: `${selectedAppointment.service || "treatment"} - ${paymentData.notes || "Payment collected"}`,
-                date: new Date().toISOString().split("T")[0]
-            };
-            const createdPayment = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["paymentService"].create(paymentPayload);
-            console.log("[v0] ✅ Payment saved to database:", createdPayment);
-            // Close modal and show success
-            setShowCollectModal(false);
-            setSelectedAppointment(null);
-            alert(`✅ PAYMENT COLLECTED SUCCESSFULLY!\n\n` + `💵 Amount: ₱${paymentData.amount.toLocaleString()}\n` + `💳 Method: ${paymentData.method.replace(/_/g, " ").toUpperCase()}\n` + `👨‍⚕️ Your Share (50%): ₱${(paymentData.amount * 0.5).toLocaleString()}\n\n` + `📊 Payment ID: ${createdPayment.id}\n\n` + `✓ Recorded in database\n` + `✓ Will appear in your Earnings\n` + `✓ Visible to HR in Payments section`);
-            // Reload appointments to update stats
-            loadAppointments();
-        } catch (error) {
-            console.error("[v0] Error recording payment:", error);
-            const errorMsg = error instanceof Error ? error.message : String(error);
-            alert(`❌ Payment collection failed!\n\nError: ${errorMsg}\n\nPlease try again or contact support.`);
         }
     };
     const handleRejectAppointment = async (appointmentId)=>{
@@ -1344,8 +1347,63 @@ function DentistDashboard() {
             setProcessingId(null);
         }
     };
+    const handleStartProcedure = async (appointment)=>{
+        setProcessingId(appointment.id);
+        try {
+            await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["appointmentService"].changeStatus(appointment.id, "in-progress");
+            setAppointments((prev)=>prev.map((apt)=>apt.id === appointment.id ? {
+                        ...apt,
+                        status: "in-progress"
+                    } : apt));
+            // Open treatment modal
+            setSelectedAppointment(appointment);
+            setShowTreatmentModal(true);
+        } catch (error) {
+            console.error("[v0] Error starting procedure:", error);
+            alert("Failed to start procedure");
+        } finally{
+            setProcessingId(null);
+        }
+    };
+    const handleSaveAndComplete = async (treatments, totalAmount)=>{
+        if (!selectedAppointment) return;
+        try {
+            // Save treatments to treatment_records
+            for (const treatment of treatments){
+                await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["treatmentRecordService"].create({
+                    patient_id: selectedAppointment.patient_id,
+                    dentist_id: selectedAppointment.dentist_id,
+                    appointment_id: selectedAppointment.id,
+                    treatment_id: treatment.treatment_id,
+                    date: selectedAppointment.date,
+                    quantity: treatment.quantity,
+                    notes: `${treatment.name} - ${treatment.quantity}x`
+                });
+            }
+            // Update appointment with total amount and mark as completed
+            await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["appointmentService"].update(selectedAppointment.id, {
+                status: "completed",
+                amount: totalAmount
+            });
+            // Update local state
+            setAppointments((prev)=>prev.map((apt)=>apt.id === selectedAppointment.id ? {
+                        ...apt,
+                        status: "completed",
+                        amount: totalAmount
+                    } : apt));
+            // Close treatment modal and show completion modal
+            setShowTreatmentModal(false);
+            setTreatmentCount(treatments.length);
+            setShowCompleteModal(true);
+            // Reload appointments
+            await loadAppointments();
+        } catch (error) {
+            console.error("[v0] Error completing appointment:", error);
+            alert("Failed to complete appointment: " + (error instanceof Error ? error.message : "Unknown error"));
+        }
+    };
     const pendingAppointments = appointments.filter((apt)=>apt.status === "pending");
-    const approvedAppointments = appointments.filter((apt)=>apt.status === "confirmed" || apt.status === "attended");
+    const approvedAppointments = appointments.filter((apt)=>apt.status === "confirmed" || apt.status === "attended" || apt.status === "in-progress");
     const todayAppointments = approvedAppointments.filter((apt)=>{
         const today = new Date().toISOString().split("T")[0];
         return apt.date === today;
@@ -1357,7 +1415,7 @@ function DentistDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                lineNumber: 221,
+                lineNumber: 250,
                 columnNumber: 33
             }, this),
             href: "/dentist/dashboard"
@@ -1368,7 +1426,7 @@ function DentistDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                lineNumber: 222,
+                lineNumber: 251,
                 columnNumber: 35
             }, this),
             href: "/dentist/schedule"
@@ -1379,7 +1437,7 @@ function DentistDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                lineNumber: 223,
+                lineNumber: 252,
                 columnNumber: 34
             }, this),
             href: "/dentist/treatments"
@@ -1390,7 +1448,7 @@ function DentistDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                lineNumber: 224,
+                lineNumber: 253,
                 columnNumber: 32
             }, this),
             href: "/dentist/earnings"
@@ -1401,7 +1459,7 @@ function DentistDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                lineNumber: 225,
+                lineNumber: 254,
                 columnNumber: 31
             }, this),
             href: "/dentist/reports"
@@ -1414,256 +1472,262 @@ function DentistDashboard() {
             className: "space-y-6",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "bg-gradient-to-r from-primary to-accent rounded-lg p-6 text-primary-foreground",
+                    className: "bg-gradient-to-r from-primary to-accent rounded-xl p-8 text-primary-foreground shadow-lg",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                            className: "text-3xl font-bold mb-2",
+                            className: "text-4xl font-bold mb-2",
                             children: [
-                                "Welcome, Dr. ",
+                                "Welcome, ",
                                 user?.name
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 233,
+                            lineNumber: 262,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "opacity-90",
+                            className: "text-lg opacity-90",
                             children: "Manage your appointments and patient treatments"
                         }, void 0, false, {
                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 234,
+                            lineNumber: 263,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                    lineNumber: 232,
+                    lineNumber: 261,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "grid grid-cols-1 md:grid-cols-4 gap-4",
+                    className: "grid grid-cols-1 md:grid-cols-4 gap-6",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
-                            className: "hover:shadow-md transition-shadow",
+                            className: "border-2 hover:border-primary hover:shadow-lg transition-all",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
                                     className: "pb-3",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
-                                        className: "text-sm font-medium text-muted-foreground",
+                                        className: "text-sm font-semibold text-muted-foreground uppercase tracking-wide",
                                         children: "Today's Appointments"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                        lineNumber: 241,
+                                        lineNumber: 270,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 240,
+                                    lineNumber: 269,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-3xl font-bold text-primary",
+                                            className: "text-4xl font-bold text-primary",
                                             children: todayAppointments.length
                                         }, void 0, false, {
                                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                            lineNumber: 244,
+                                            lineNumber: 273,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-xs text-muted-foreground mt-1",
+                                            className: "text-sm text-muted-foreground mt-2",
                                             children: "All confirmed"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                            lineNumber: 245,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 243,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 239,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
-                            className: "hover:shadow-md transition-shadow",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
-                                    className: "pb-3",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
-                                        className: "text-sm font-medium text-muted-foreground",
-                                        children: "Pending Approvals"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                        lineNumber: 251,
-                                        columnNumber: 15
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 250,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-3xl font-bold text-yellow-600",
-                                            children: pendingAppointments.length
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                            lineNumber: 254,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-xs text-muted-foreground mt-1",
-                                            children: "Awaiting action"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                            lineNumber: 255,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 253,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 249,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
-                            className: "hover:shadow-md transition-shadow",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
-                                    className: "pb-3",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
-                                        className: "text-sm font-medium text-muted-foreground",
-                                        children: "This Week"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                        lineNumber: 261,
-                                        columnNumber: 15
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 260,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-3xl font-bold text-primary",
-                                            children: approvedAppointments.length
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                            lineNumber: 264,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-xs text-muted-foreground mt-1",
-                                            children: "Total appointments"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                            lineNumber: 265,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 263,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 259,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
-                            className: "hover:shadow-md transition-shadow",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
-                                    className: "pb-3",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
-                                        className: "text-sm font-medium text-muted-foreground",
-                                        children: "Completed Today"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                        lineNumber: 271,
-                                        columnNumber: 15
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 270,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "text-3xl font-bold text-green-600",
-                                            children: appointments.filter((apt)=>apt.status === "completed").length
                                         }, void 0, false, {
                                             fileName: "[project]/app/dentist/dashboard/page.tsx",
                                             lineNumber: 274,
                                             columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-xs text-muted-foreground mt-1",
-                                            children: "Completed"
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                    lineNumber: 272,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/dentist/dashboard/page.tsx",
+                            lineNumber: 268,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
+                            className: "border-2 hover:border-yellow-500 hover:shadow-lg transition-all",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
+                                    className: "pb-3",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
+                                        className: "text-sm font-semibold text-muted-foreground uppercase tracking-wide",
+                                        children: "Pending Approvals"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                        lineNumber: 280,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                    lineNumber: 279,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-4xl font-bold text-yellow-600",
+                                            children: pendingAppointments.length
                                         }, void 0, false, {
                                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                            lineNumber: 277,
+                                            lineNumber: 283,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-sm text-muted-foreground mt-2",
+                                            children: "Awaiting action"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                            lineNumber: 284,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 273,
+                                    lineNumber: 282,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 269,
+                            lineNumber: 278,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
+                            className: "border-2 hover:border-primary hover:shadow-lg transition-all",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
+                                    className: "pb-3",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
+                                        className: "text-sm font-semibold text-muted-foreground uppercase tracking-wide",
+                                        children: "This Week"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                        lineNumber: 290,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                    lineNumber: 289,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-4xl font-bold text-primary",
+                                            children: approvedAppointments.length
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                            lineNumber: 293,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-sm text-muted-foreground mt-2",
+                                            children: "Total appointments"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                            lineNumber: 294,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                    lineNumber: 292,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/dentist/dashboard/page.tsx",
+                            lineNumber: 288,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
+                            className: "border-2 hover:border-green-500 hover:shadow-lg transition-all",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
+                                    className: "pb-3",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
+                                        className: "text-sm font-semibold text-muted-foreground uppercase tracking-wide",
+                                        children: "💵 Total Earnings"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                        lineNumber: 300,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                    lineNumber: 299,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-4xl font-bold text-green-600",
+                                            children: [
+                                                "₱",
+                                                (stats.earnings || 0).toLocaleString()
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                            lineNumber: 303,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-sm text-muted-foreground mt-2",
+                                            children: "From completed appointments"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                            lineNumber: 304,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                    lineNumber: 302,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/dentist/dashboard/page.tsx",
+                            lineNumber: 298,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                    lineNumber: 238,
+                    lineNumber: 267,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
+                    className: "border-2 shadow-md",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
+                                    className: "text-2xl font-bold",
                                     children: "Pending Appointment Approvals"
                                 }, void 0, false, {
                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 285,
+                                    lineNumber: 312,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardDescription"], {
+                                    className: "text-base",
                                     children: "Appointments awaiting your decision"
                                 }, void 0, false, {
                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 286,
+                                    lineNumber: 313,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 284,
+                            lineNumber: 311,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1672,14 +1736,14 @@ function DentistDashboard() {
                                 children: "Loading appointments..."
                             }, void 0, false, {
                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                lineNumber: 290,
+                                lineNumber: 317,
                                 columnNumber: 15
                             }, this) : pendingAppointments.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "text-center py-8 text-muted-foreground",
                                 children: "No pending appointments"
                             }, void 0, false, {
                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                lineNumber: 292,
+                                lineNumber: 319,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-3",
@@ -1696,12 +1760,12 @@ function DentistDashboard() {
                                                             children: apt.patients?.name ? apt.patients.name.charAt(0) : "?"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                            lineNumber: 302,
+                                                            lineNumber: 329,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                        lineNumber: 301,
+                                                        lineNumber: 328,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1711,7 +1775,7 @@ function DentistDashboard() {
                                                                 children: apt.patients?.name || "Unknown Patient"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                                lineNumber: 307,
+                                                                lineNumber: 334,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1723,19 +1787,19 @@ function DentistDashboard() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                                lineNumber: 308,
+                                                                lineNumber: 335,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                        lineNumber: 306,
+                                                        lineNumber: 333,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                lineNumber: 300,
+                                                lineNumber: 327,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1751,14 +1815,14 @@ function DentistDashboard() {
                                                                 className: "w-4 h-4 mr-1"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                                lineNumber: 320,
+                                                                lineNumber: 347,
                                                                 columnNumber: 25
                                                             }, this),
                                                             processingId === apt.id ? "..." : "Accept"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                        lineNumber: 314,
+                                                        lineNumber: 341,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1772,66 +1836,69 @@ function DentistDashboard() {
                                                                 className: "w-4 h-4 mr-1"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                                lineNumber: 330,
+                                                                lineNumber: 357,
                                                                 columnNumber: 25
                                                             }, this),
                                                             processingId === apt.id ? "..." : "Reject"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                        lineNumber: 323,
+                                                        lineNumber: 350,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                lineNumber: 313,
+                                                lineNumber: 340,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, apt.id, true, {
                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                        lineNumber: 296,
+                                        lineNumber: 323,
                                         columnNumber: 19
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                lineNumber: 294,
+                                lineNumber: 321,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 288,
+                            lineNumber: 315,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                    lineNumber: 283,
+                    lineNumber: 310,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
+                    className: "border-2 shadow-md",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
+                                    className: "text-2xl font-bold",
                                     children: "Approved / Attended"
                                 }, void 0, false, {
                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 344,
+                                    lineNumber: 371,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardDescription"], {
+                                    className: "text-base",
                                     children: "Complete after visit"
                                 }, void 0, false, {
                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 345,
+                                    lineNumber: 372,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 343,
+                            lineNumber: 370,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1840,7 +1907,7 @@ function DentistDashboard() {
                                 children: "No approved/attended appointments"
                             }, void 0, false, {
                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                lineNumber: 349,
+                                lineNumber: 376,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-3",
@@ -1857,12 +1924,12 @@ function DentistDashboard() {
                                                             children: apt.patients?.name ? apt.patients.name.charAt(0) : "?"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                            lineNumber: 359,
+                                                            lineNumber: 386,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                        lineNumber: 358,
+                                                        lineNumber: 385,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1872,7 +1939,7 @@ function DentistDashboard() {
                                                                 children: apt.patients?.name || "Unknown Patient"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                                lineNumber: 364,
+                                                                lineNumber: 391,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1884,100 +1951,146 @@ function DentistDashboard() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                                lineNumber: 365,
+                                                                lineNumber: 392,
                                                                 columnNumber: 25
                                                             }, this),
                                                             apt.status === "attended" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                className: "text-xs text-blue-600",
-                                                                children: "Patient marked as attended"
+                                                                className: "text-xs text-blue-600 font-semibold",
+                                                                children: "✓ Patient marked as attended - Ready to start"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                                lineNumber: 369,
+                                                                lineNumber: 396,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            apt.status === "in-progress" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                className: "text-xs text-orange-600 font-semibold",
+                                                                children: "⚡ Procedure in progress"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                                                lineNumber: 399,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                        lineNumber: 363,
+                                                        lineNumber: 390,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                lineNumber: 357,
+                                                lineNumber: 384,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "flex gap-2",
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
-                                                    size: "sm",
-                                                    className: "bg-green-600 hover:bg-green-700 text-white",
-                                                    onClick: ()=>handleCompleteAppointment(apt),
-                                                    disabled: processingId === apt.id,
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2d$big$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle$3e$__["CheckCircle"], {
-                                                            className: "w-4 h-4 mr-1"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                            lineNumber: 380,
-                                                            columnNumber: 25
-                                                        }, this),
-                                                        processingId === apt.id ? "..." : "Complete"
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                    lineNumber: 374,
-                                                    columnNumber: 23
-                                                }, this)
-                                            }, void 0, false, {
+                                                children: [
+                                                    apt.status === "attended" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                                        size: "sm",
+                                                        className: "bg-blue-600 hover:bg-blue-700 text-white",
+                                                        onClick: ()=>handleStartProcedure(apt),
+                                                        disabled: processingId === apt.id,
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$bluetooth$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Bluetooth$3e$__["Bluetooth"], {
+                                                                className: "w-4 h-4 mr-1"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                                                lineNumber: 411,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            processingId === apt.id ? "..." : "Start Procedure"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                                        lineNumber: 405,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    apt.status === "in-progress" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                                        size: "sm",
+                                                        className: "bg-orange-600 hover:bg-orange-700 text-white",
+                                                        onClick: ()=>{
+                                                            setSelectedAppointment(apt);
+                                                            setShowTreatmentModal(true);
+                                                        },
+                                                        disabled: processingId === apt.id,
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$bluetooth$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Bluetooth$3e$__["Bluetooth"], {
+                                                                className: "w-4 h-4 mr-1"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                                                lineNumber: 425,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            processingId === apt.id ? "..." : "Add Treatments"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                                        lineNumber: 416,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    apt.status === "confirmed" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                                        size: "sm",
+                                                        className: "bg-gray-400 text-white cursor-not-allowed",
+                                                        disabled: true,
+                                                        children: "Waiting for Patient Check-in"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/dentist/dashboard/page.tsx",
+                                                        lineNumber: 430,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                lineNumber: 373,
+                                                lineNumber: 403,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, apt.id, true, {
                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                        lineNumber: 353,
+                                        lineNumber: 380,
                                         columnNumber: 19
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                lineNumber: 351,
+                                lineNumber: 378,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 347,
+                            lineNumber: 374,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                    lineNumber: 342,
+                    lineNumber: 369,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
+                    className: "border-2 shadow-md",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
+                                    className: "text-2xl font-bold",
                                     children: "Today's Schedule"
                                 }, void 0, false, {
                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 394,
+                                    lineNumber: 449,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardDescription"], {
+                                    className: "text-base",
                                     children: "Your confirmed appointments for today"
                                 }, void 0, false, {
                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                    lineNumber: 395,
+                                    lineNumber: 450,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 393,
+                            lineNumber: 448,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1986,7 +2099,7 @@ function DentistDashboard() {
                                 children: "No appointments today"
                             }, void 0, false, {
                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                lineNumber: 399,
+                                lineNumber: 454,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-3",
@@ -2003,7 +2116,7 @@ function DentistDashboard() {
                                                             children: apt.patients?.name || "Unknown Patient"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                            lineNumber: 406,
+                                                            lineNumber: 461,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2011,18 +2124,18 @@ function DentistDashboard() {
                                                             children: apt.time
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                            lineNumber: 407,
+                                                            lineNumber: 462,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                    lineNumber: 405,
+                                                    lineNumber: 460,
                                                     columnNumber: 23
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                lineNumber: 404,
+                                                lineNumber: 459,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2032,49 +2145,49 @@ function DentistDashboard() {
                                                     children: "Confirmed"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                    lineNumber: 411,
+                                                    lineNumber: 466,
                                                     columnNumber: 23
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                                lineNumber: 410,
+                                                lineNumber: 465,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, apt.id, true, {
                                         fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                        lineNumber: 403,
+                                        lineNumber: 458,
                                         columnNumber: 19
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/dentist/dashboard/page.tsx",
-                                lineNumber: 401,
+                                lineNumber: 456,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dentist/dashboard/page.tsx",
-                            lineNumber: 397,
+                            lineNumber: 452,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/dentist/dashboard/page.tsx",
-                    lineNumber: 392,
+                    lineNumber: 447,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/dentist/dashboard/page.tsx",
-            lineNumber: 230,
+            lineNumber: 259,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/dentist/dashboard/page.tsx",
-        lineNumber: 229,
+        lineNumber: 258,
         columnNumber: 5
     }, this);
 }
-_s(DentistDashboard, "akhjoHGSgUKimtyNUW2kcWWce/8=", false, function() {
+_s(DentistDashboard, "xN0/2YHwqVWUnFXCIv6bWHb9Vbo=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"]
     ];

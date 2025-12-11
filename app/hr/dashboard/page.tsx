@@ -28,6 +28,10 @@ export default function HRDashboard() {
     todayAppointments: 0,
     pendingPayments: 0,
     lowStockItems: 0,
+    needDentistAssignment: 0,
+    confirmedAppointments: 0,
+    readyForPayment: 0,
+    inProgress: 0,
   })
   const [todayAppointments, setTodayAppointments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -48,12 +52,22 @@ export default function HRDashboard() {
           .filter((p: any) => p.status !== "paid")
           .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
         const lowStockCount = (inventory || []).filter((i: any) => i.status === "low" || i.status === "critical").length
+        
+        // Appointment status counts
+        const needAssignment = (appointments || []).filter((a: any) => a.status === "pending" && !a.dentist_id).length
+        const confirmed = (appointments || []).filter((a: any) => a.status === "confirmed").length
+        const readyForPayment = (appointments || []).filter((a: any) => a.status === "completed").length
+        const inProgress = (appointments || []).filter((a: any) => a.status === "in-progress").length
 
         setStats({
           totalPatients: patients?.length || 0,
           todayAppointments: todayAppts?.length || 0,
           pendingPayments: pendingPaymentsAmount || 0,
           lowStockItems: lowStockCount || 0,
+          needDentistAssignment: needAssignment || 0,
+          confirmedAppointments: confirmed || 0,
+          readyForPayment: readyForPayment || 0,
+          inProgress: inProgress || 0,
         })
         setTodayAppointments((todayAppts || []).slice(0, 4))
       } catch (error) {
@@ -63,6 +77,10 @@ export default function HRDashboard() {
           todayAppointments: 0,
           pendingPayments: 0,
           lowStockItems: 0,
+          needDentistAssignment: 0,
+          confirmedAppointments: 0,
+          readyForPayment: 0,
+          inProgress: 0,
         })
         setTodayAppointments([])
       } finally {
@@ -135,6 +153,72 @@ export default function HRDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Appointment Status Overview */}
+        <Card className="border-2 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold flex items-center gap-2">
+              <Calendar className="w-6 h-6 text-primary" />
+              Appointment Status Overview
+            </CardTitle>
+            <CardDescription>Quick view of all appointment states</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Link href="/hr/appointments">
+                <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg hover:border-red-400 hover:shadow-md transition-all cursor-pointer">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-red-700">Need Dentist</span>
+                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-red-600" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-red-600">{stats.needDentistAssignment}</div>
+                  <p className="text-xs text-red-600 mt-1">Awaiting assignment</p>
+                </div>
+              </Link>
+
+              <Link href="/hr/appointments">
+                <div className="p-4 bg-purple-50 border-2 border-purple-200 rounded-lg hover:border-purple-400 hover:shadow-md transition-all cursor-pointer">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-purple-700">Confirmed</span>
+                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-purple-600" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-purple-600">{stats.confirmedAppointments}</div>
+                  <p className="text-xs text-purple-600 mt-1">Ready for check-in</p>
+                </div>
+              </Link>
+
+              <Link href="/hr/appointments">
+                <div className="p-4 bg-orange-50 border-2 border-orange-200 rounded-lg hover:border-orange-400 hover:shadow-md transition-all cursor-pointer">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-orange-700">In Progress</span>
+                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                      <Tooth className="w-4 h-4 text-orange-600" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-orange-600">{stats.inProgress}</div>
+                  <p className="text-xs text-orange-600 mt-1">Treatment ongoing</p>
+                </div>
+              </Link>
+
+              <Link href="/hr/appointments">
+                <div className="p-4 bg-green-50 border-2 border-green-200 rounded-lg hover:border-green-400 hover:shadow-md transition-all cursor-pointer">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-green-700">Ready for Payment</span>
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <CreditCard className="w-4 h-4 text-green-600" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-green-600">{stats.readyForPayment}</div>
+                  <p className="text-xs text-green-600 mt-1">Completed appointments</p>
+                </div>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

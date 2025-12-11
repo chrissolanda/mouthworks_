@@ -18,6 +18,7 @@
   "/hr/reports/page": "app/hr/reports/page.js",
   "/hr/settings/page": "app/hr/settings/page.js",
   "/hr/treatments/page": "app/hr/treatments/page.js",
+  "/login/page": "app/login/page.js",
   "/page": "app/page.js",
   "/patient/appointments/page": "app/patient/appointments/page.js",
   "/patient/dashboard/page": "app/patient/dashboard/page.js",

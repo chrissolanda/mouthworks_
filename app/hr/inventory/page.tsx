@@ -53,7 +53,19 @@ export default function HRInventory() {
         inventoryService.getAll(),
         supplyRequestService.getAll(),
       ])
-      setInventory(inventoryData || [])
+      
+      // Calculate status based on quantity vs min_quantity
+      const inventoryWithStatus = (inventoryData || []).map((item: any) => {
+        let status = "ok"
+        if (item.quantity <= 0) {
+          status = "critical"
+        } else if (item.quantity <= item.min_quantity) {
+          status = "low"
+        }
+        return { ...item, status }
+      })
+      
+      setInventory(inventoryWithStatus)
       setStaffRequests(requestsData || [])
     } catch (error) {
       console.error("[v0] Error loading inventory:", error)

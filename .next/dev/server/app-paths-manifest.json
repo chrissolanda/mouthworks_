@@ -1,11 +1,12 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/payments/create/route": "app/api/payments/create/route.js",
+  "/dentist/dashboard/page": "app/dentist/dashboard/page.js",
   "/hr/appointments/page": "app/hr/appointments/page.js",
   "/hr/dashboard/page": "app/hr/dashboard/page.js",
-  "/hr/inventory/page": "app/hr/inventory/page.js",
-  "/hr/patients/page": "app/hr/patients/page.js",
   "/hr/payments/page": "app/hr/payments/page.js",
+  "/hr/reports/page": "app/hr/reports/page.js",
   "/hr/treatments/page": "app/hr/treatments/page.js",
   "/login/page": "app/login/page.js",
-  "/page": "app/page.js",
-  "/patient/dashboard/page": "app/patient/dashboard/page.js"
+  "/page": "app/page.js"
 }

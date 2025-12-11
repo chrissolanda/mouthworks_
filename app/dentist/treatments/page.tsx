@@ -1,41 +1,69 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
 import MainLayout from "@/components/layout/main-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { LayoutDashboard, Calendar, Bluetooth as Tooth, BarChart3, Plus, Edit, Trash2, Search, DollarSign } from "lucide-react"
-import AddTreatmentModal from "@/components/modals/add-treatment-modal"
+import { LayoutDashboard, Calendar, Bluetooth as Tooth, BarChart3, Search, DollarSign, Package } from "lucide-react"
+import { treatmentRecordService, dentistService } from "@/lib/db-service"
+import { formatCurrency } from "@/lib/utils"
 
-interface PatientTreatment {
+interface TreatmentRecord {
   id: string
-  patientId: string
-  patientName: string
-  appointmentId: string
+  patient_id: string
+  dentist_id: string
+  appointment_id?: string
+  treatment_id?: string
   date: string
-  treatment: string
-  description: string
-  notes: string
+  quantity: number
+  notes?: string
+  patients?: { name: string; email: string }
+  treatments?: { name: string; price: number; category: string }
 }
 
 export default function DentistTreatments() {
   const { user } = useAuth()
-  const [treatments, setTreatments] = useState<PatientTreatment[]>([
-    {
-      id: "1",
-      patientId: "1",
-      patientName: "John Patient",
-      appointmentId: "1",
-      date: "2024-11-10",
-      treatment: "Cleaning",
-      description: "Professional dental cleaning and plaque removal",
-      notes: "Patient cooperated well. Recommend regular cleaning every 6 months.",
-    },
-  ])
-  const [showAddModal, setShowAddModal] = useState(false)
+  const [treatmentRecords, setTreatmentRecords] = useState<TreatmentRecord[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [dentistTableId, setDentistTableId] = useState<string | null>(null)
+
+  useEffect(() => {
+    loadData()
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(() => {
+      loadData()
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [user?.email])
+
+  const loadData = async () => {
+    if (!user?.email) return
+    
+    try {
+      setLoading(true)
+      // Get dentist table ID
+      const dentists = await dentistService.getAll()
+      const matchByUser = (dentists || []).find((d: any) => d.user_id === user.id)
+      const matchByEmail = (dentists || []).find(
+        (d: any) => (d.email || "").toLowerCase() === (user.email || "").toLowerCase()
+      )
+      const match = matchByUser || matchByEmail
+      
+      if (match?.id) {
+        setDentistTableId(match.id)
+        // Load treatment records for this dentist
+        const records = await treatmentRecordService.getByDentistId(match.id)
+        setTreatmentRecords(records || [])
+      }
+    } catch (error) {
+      console.error("[v0] Error loading treatment records:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const navItems = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, href: "/dentist/dashboard" },
@@ -45,26 +73,10 @@ export default function DentistTreatments() {
     { label: "Reports", icon: <BarChart3 className="w-5 h-5" />, href: "/dentist/reports" },
   ]
 
-  const handleAddTreatment = (data: any) => {
-    const newTreatment: PatientTreatment = {
-      id: String(treatments.length + 1),
-      ...data,
-      date: new Date().toISOString().split("T")[0],
-    }
-    setTreatments([...treatments, newTreatment])
-    setShowAddModal(false)
-  }
-
-  const handleDeleteTreatment = (id: string) => {
-    if (confirm("Are you sure you want to delete this treatment record?")) {
-      setTreatments(treatments.filter((t) => t.id !== id))
-    }
-  }
-
-  const filteredTreatments = treatments.filter(
+  const filteredRecords = treatmentRecords.filter(
     (t) =>
-      t.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.treatment.toLowerCase().includes(searchTerm.toLowerCase()),
+      t.patients?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.treatments?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
@@ -74,14 +86,14 @@ export default function DentistTreatments() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-foreground">Treatment Records</h2>
-            <p className="text-muted-foreground">Record and manage patient treatments</p>
+            <p className="text-muted-foreground">View all treatments you've performed</p>
           </div>
           <Button
-            onClick={() => setShowAddModal(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
+            onClick={loadData}
+            variant="outline"
+            className="gap-2"
           >
-            <Plus className="w-4 h-4" />
-            Add Treatment
+            🔄 Refresh
           </Button>
         </div>
 
@@ -105,50 +117,75 @@ export default function DentistTreatments() {
         <Card>
           <CardHeader>
             <CardTitle>Patient Treatments</CardTitle>
-            <CardDescription>{filteredTreatments.length} treatment record(s)</CardDescription>
+            <CardDescription>{filteredRecords.length} treatment record(s)</CardDescription>
           </CardHeader>
           <CardContent>
-            {filteredTreatments.length === 0 ? (
+            {loading ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No treatment records found</p>
+                <p className="text-muted-foreground">Loading treatment records...</p>
+              </div>
+            ) : filteredRecords.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-30" />
+                <p className="text-muted-foreground mb-2">No treatment records found</p>
+                <p className="text-sm text-muted-foreground">
+                  Treatment records will appear here after you complete appointments with treatments
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredTreatments.map((treatment) => (
+                {filteredRecords.map((record) => (
                   <div
-                    key={treatment.id}
-                    className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                    key={record.id}
+                    className="p-5 border-2 border-border rounded-lg hover:border-primary/50 hover:shadow-md transition-all"
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="font-semibold text-foreground">{treatment.treatment}</h3>
-                        <p className="text-sm text-muted-foreground">Patient: {treatment.patientName}</p>
-                        <p className="text-sm text-muted-foreground">Date: {treatment.date}</p>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Tooth className="w-5 h-5 text-primary" />
+                          <h3 className="text-lg font-bold text-foreground">
+                            {record.treatments?.name || "Treatment"}
+                          </h3>
+                          {record.treatments?.category && (
+                            <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
+                              {record.treatments.category}
+                            </span>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">Patient:</span>{" "}
+                            <span className="font-medium text-foreground">
+                              {record.patients?.name || "Unknown"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Date:</span>{" "}
+                            <span className="font-medium text-foreground">{record.date}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Quantity:</span>{" "}
+                            <span className="font-medium text-foreground">{record.quantity || 1}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button className="p-1.5 hover:bg-muted rounded-lg transition-colors text-primary">
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteTreatment(treatment.id)}
-                          className="p-1.5 hover:bg-destructive/10 rounded-lg transition-colors text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Description</p>
-                        <p className="text-sm text-foreground">{treatment.description}</p>
-                      </div>
-                      {treatment.notes && (
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">Notes</p>
-                          <p className="text-sm text-foreground">{treatment.notes}</p>
+                      {record.treatments?.price && (
+                        <div className="text-right ml-4">
+                          <p className="text-xs text-muted-foreground">Amount</p>
+                          <p className="text-xl font-bold text-primary">
+                            {formatCurrency(record.treatments.price * (record.quantity || 1))}
+                          </p>
                         </div>
                       )}
                     </div>
+                    {record.notes && (
+                      <div className="mt-3 pt-3 border-t border-border">
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Notes</p>
+                        <p className="text-sm text-foreground bg-muted/30 p-2 rounded">
+                          {record.notes}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -156,8 +193,6 @@ export default function DentistTreatments() {
           </CardContent>
         </Card>
       </div>
-
-      {showAddModal && <AddTreatmentModal onClose={() => setShowAddModal(false)} onSubmit={handleAddTreatment} />}
     </MainLayout>
   )
 }

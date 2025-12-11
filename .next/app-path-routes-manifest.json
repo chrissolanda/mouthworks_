@@ -18,6 +18,7 @@
   "/hr/reports/page": "/hr/reports",
   "/hr/settings/page": "/hr/settings",
   "/hr/treatments/page": "/hr/treatments",
+  "/login/page": "/login",
   "/page": "/",
   "/patient/appointments/page": "/patient/appointments",
   "/patient/dashboard/page": "/patient/dashboard",

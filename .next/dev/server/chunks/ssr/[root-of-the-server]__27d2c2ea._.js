@@ -643,12 +643,21 @@ const patientService = {
         return data;
     },
     async update (id, updates) {
-        const { data, error } = await getSupabase().from("patients").update({
-            ...updates,
-            updated_at: new Date()
-        }).eq("id", id).select().single();
-        if (error) throw error;
-        return data;
+        try {
+            const { data, error } = await getSupabase().from("patients").update({
+                ...updates,
+                updated_at: new Date()
+            }).eq("id", id).select().single();
+            if (error) {
+                console.error("[v0] Supabase error updating patient:", error);
+                throw new Error(`Failed to update patient: ${error.message}`);
+            }
+            return data;
+        } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : JSON.stringify(err);
+            console.error("[v0] Error in patientService.update():", errorMsg);
+            throw err;
+        }
     },
     async delete (id) {
         const { error } = await getSupabase().from("patients").delete().eq("id", id);
@@ -1552,7 +1561,20 @@ function HRInventory() {
                 __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["inventoryService"].getAll(),
                 __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["supplyRequestService"].getAll()
             ]);
-            setInventory(inventoryData || []);
+            // Calculate status based on quantity vs min_quantity
+            const inventoryWithStatus = (inventoryData || []).map((item)=>{
+                let status = "ok";
+                if (item.quantity <= 0) {
+                    status = "critical";
+                } else if (item.quantity <= item.min_quantity) {
+                    status = "low";
+                }
+                return {
+                    ...item,
+                    status
+                };
+            });
+            setInventory(inventoryWithStatus);
             setStaffRequests(requestsData || []);
         } catch (error) {
             console.error("[v0] Error loading inventory:", error);
@@ -1567,7 +1589,7 @@ function HRInventory() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 66,
+                lineNumber: 78,
                 columnNumber: 33
             }, this),
             href: "/hr/dashboard"
@@ -1578,7 +1600,7 @@ function HRInventory() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 67,
+                lineNumber: 79,
                 columnNumber: 32
             }, this),
             href: "/hr/patients"
@@ -1589,7 +1611,7 @@ function HRInventory() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 68,
+                lineNumber: 80,
                 columnNumber: 36
             }, this),
             href: "/hr/appointments"
@@ -1600,7 +1622,7 @@ function HRInventory() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 69,
+                lineNumber: 81,
                 columnNumber: 34
             }, this),
             href: "/hr/treatments"
@@ -1611,7 +1633,7 @@ function HRInventory() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 70,
+                lineNumber: 82,
                 columnNumber: 32
             }, this),
             href: "/hr/payments"
@@ -1622,7 +1644,7 @@ function HRInventory() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 71,
+                lineNumber: 83,
                 columnNumber: 33
             }, this),
             href: "/hr/inventory"
@@ -1633,7 +1655,7 @@ function HRInventory() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 72,
+                lineNumber: 84,
                 columnNumber: 31
             }, this),
             href: "/hr/reports"
@@ -1644,7 +1666,7 @@ function HRInventory() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 73,
+                lineNumber: 85,
                 columnNumber: 32
             }, this),
             href: "/hr/settings"
@@ -1713,7 +1735,7 @@ function HRInventory() {
                                         children: "Inventory Management"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 131,
+                                        lineNumber: 143,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1721,13 +1743,13 @@ function HRInventory() {
                                         children: "Track dental supplies and materials"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 132,
+                                        lineNumber: 144,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 130,
+                                lineNumber: 142,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1738,20 +1760,20 @@ function HRInventory() {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 138,
+                                        lineNumber: 150,
                                         columnNumber: 13
                                     }, this),
                                     "Add Item"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 134,
+                                lineNumber: 146,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/inventory/page.tsx",
-                        lineNumber: 129,
+                        lineNumber: 141,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1767,12 +1789,12 @@ function HRInventory() {
                                             children: "Total Items"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                            lineNumber: 147,
+                                            lineNumber: 159,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 146,
+                                        lineNumber: 158,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1782,7 +1804,7 @@ function HRInventory() {
                                                 children: inventory.length
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                lineNumber: 150,
+                                                lineNumber: 162,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1790,19 +1812,19 @@ function HRInventory() {
                                                 children: "In stock"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                lineNumber: 151,
+                                                lineNumber: 163,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 149,
+                                        lineNumber: 161,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 145,
+                                lineNumber: 157,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1815,12 +1837,12 @@ function HRInventory() {
                                             children: "Low Stock"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                            lineNumber: 157,
+                                            lineNumber: 169,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 156,
+                                        lineNumber: 168,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1830,7 +1852,7 @@ function HRInventory() {
                                                 children: lowStockItems.length
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                lineNumber: 160,
+                                                lineNumber: 172,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1838,19 +1860,19 @@ function HRInventory() {
                                                 children: "Need attention"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                lineNumber: 161,
+                                                lineNumber: 173,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 159,
+                                        lineNumber: 171,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 155,
+                                lineNumber: 167,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1861,54 +1883,6 @@ function HRInventory() {
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardTitle"], {
                                             className: "text-sm font-medium text-muted-foreground",
                                             children: "Critical"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/hr/inventory/page.tsx",
-                                            lineNumber: 167,
-                                            columnNumber: 15
-                                        }, this)
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 166,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "text-3xl font-bold text-destructive",
-                                                children: inventory.filter((i)=>i.status === "critical").length
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/hr/inventory/page.tsx",
-                                                lineNumber: 170,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "text-xs text-muted-foreground mt-1",
-                                                children: "Urgent restock"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/hr/inventory/page.tsx",
-                                                lineNumber: 173,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 169,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 165,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
-                                className: "hover:shadow-md transition-shadow",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardHeader"], {
-                                        className: "pb-3",
-                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardTitle"], {
-                                            className: "text-sm font-medium text-muted-foreground",
-                                            children: "Pending Requests"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/inventory/page.tsx",
                                             lineNumber: 179,
@@ -1922,8 +1896,8 @@ function HRInventory() {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "text-3xl font-bold text-blue-600",
-                                                children: staffRequests.filter((r)=>r.status === "pending").length
+                                                className: "text-3xl font-bold text-destructive",
+                                                children: inventory.filter((i)=>i.status === "critical").length
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/inventory/page.tsx",
                                                 lineNumber: 182,
@@ -1931,7 +1905,7 @@ function HRInventory() {
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 className: "text-xs text-muted-foreground mt-1",
-                                                children: "Staff requests"
+                                                children: "Urgent restock"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/inventory/page.tsx",
                                                 lineNumber: 185,
@@ -1948,11 +1922,59 @@ function HRInventory() {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
                                 lineNumber: 177,
                                 columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
+                                className: "hover:shadow-md transition-shadow",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardHeader"], {
+                                        className: "pb-3",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardTitle"], {
+                                            className: "text-sm font-medium text-muted-foreground",
+                                            children: "Pending Requests"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/hr/inventory/page.tsx",
+                                            lineNumber: 191,
+                                            columnNumber: 15
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/hr/inventory/page.tsx",
+                                        lineNumber: 190,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-3xl font-bold text-blue-600",
+                                                children: staffRequests.filter((r)=>r.status === "pending").length
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/hr/inventory/page.tsx",
+                                                lineNumber: 194,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-xs text-muted-foreground mt-1",
+                                                children: "Staff requests"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/hr/inventory/page.tsx",
+                                                lineNumber: 197,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/hr/inventory/page.tsx",
+                                        lineNumber: 193,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/hr/inventory/page.tsx",
+                                lineNumber: 189,
+                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/inventory/page.tsx",
-                        lineNumber: 144,
+                        lineNumber: 156,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1965,7 +1987,7 @@ function HRInventory() {
                                         className: "absolute left-3 top-2.5 w-4 h-4 text-muted-foreground"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 194,
+                                        lineNumber: 206,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -1976,23 +1998,23 @@ function HRInventory() {
                                         className: "pl-10 border-border"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 195,
+                                        lineNumber: 207,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 193,
+                                lineNumber: 205,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/inventory/page.tsx",
-                            lineNumber: 192,
+                            lineNumber: 204,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/hr/inventory/page.tsx",
-                        lineNumber: 191,
+                        lineNumber: 203,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -2003,7 +2025,7 @@ function HRInventory() {
                                         children: "Stock Inventory"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 209,
+                                        lineNumber: 221,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
@@ -2013,13 +2035,13 @@ function HRInventory() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 210,
+                                        lineNumber: 222,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 208,
+                                lineNumber: 220,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2037,7 +2059,7 @@ function HRInventory() {
                                                             children: "Item Name"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 217,
+                                                            lineNumber: 229,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2045,7 +2067,7 @@ function HRInventory() {
                                                             children: "Category"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 218,
+                                                            lineNumber: 230,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2053,7 +2075,7 @@ function HRInventory() {
                                                             children: "Quantity"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 219,
+                                                            lineNumber: 231,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2061,7 +2083,7 @@ function HRInventory() {
                                                             children: "Min Level"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 220,
+                                                            lineNumber: 232,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2069,7 +2091,7 @@ function HRInventory() {
                                                             children: "Supplier"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 221,
+                                                            lineNumber: 233,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2077,7 +2099,7 @@ function HRInventory() {
                                                             children: "Status"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 222,
+                                                            lineNumber: 234,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -2085,18 +2107,18 @@ function HRInventory() {
                                                             children: "Actions"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 223,
+                                                            lineNumber: 235,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                    lineNumber: 216,
+                                                    lineNumber: 228,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                lineNumber: 215,
+                                                lineNumber: 227,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -2115,7 +2137,7 @@ function HRInventory() {
                                                                             children: item.name
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                            lineNumber: 233,
+                                                                            lineNumber: 245,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         itemPendingRequests.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2125,7 +2147,7 @@ function HRInventory() {
                                                                                     className: "w-1.5 h-1.5 bg-blue-700 rounded-full"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                                    lineNumber: 236,
+                                                                                    lineNumber: 248,
                                                                                     columnNumber: 33
                                                                                 }, this),
                                                                                 itemPendingRequests.length,
@@ -2134,31 +2156,15 @@ function HRInventory() {
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                            lineNumber: 235,
+                                                                            lineNumber: 247,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                    lineNumber: 232,
+                                                                    lineNumber: 244,
                                                                     columnNumber: 27
                                                                 }, this)
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                lineNumber: 231,
-                                                                columnNumber: 25
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                className: "py-3 px-4 text-sm text-muted-foreground",
-                                                                children: item.category || "-"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                lineNumber: 242,
-                                                                columnNumber: 25
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                className: "py-3 px-4 text-sm font-semibold text-foreground",
-                                                                children: item.quantity
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/inventory/page.tsx",
                                                                 lineNumber: 243,
@@ -2166,10 +2172,26 @@ function HRInventory() {
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                 className: "py-3 px-4 text-sm text-muted-foreground",
+                                                                children: item.category || "-"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/hr/inventory/page.tsx",
+                                                                lineNumber: 254,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                className: "py-3 px-4 text-sm font-semibold text-foreground",
+                                                                children: item.quantity
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/hr/inventory/page.tsx",
+                                                                lineNumber: 255,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                className: "py-3 px-4 text-sm text-muted-foreground",
                                                                 children: item.min_quantity
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                lineNumber: 244,
+                                                                lineNumber: 256,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2177,7 +2199,7 @@ function HRInventory() {
                                                                 children: item.supplier || "-"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                lineNumber: 245,
+                                                                lineNumber: 257,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2191,31 +2213,31 @@ function HRInventory() {
                                                                                 className: "w-3 h-3"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                                lineNumber: 257,
+                                                                                lineNumber: 269,
                                                                                 columnNumber: 62
                                                                             }, this),
                                                                             item.status === "low" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trending$2d$down$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__TrendingDown$3e$__["TrendingDown"], {
                                                                                 className: "w-3 h-3"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                                lineNumber: 258,
+                                                                                lineNumber: 270,
                                                                                 columnNumber: 57
                                                                             }, this),
                                                                             item.status.charAt(0).toUpperCase() + item.status.slice(1)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                        lineNumber: 248,
+                                                                        lineNumber: 260,
                                                                         columnNumber: 29
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                    lineNumber: 247,
+                                                                    lineNumber: 259,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                lineNumber: 246,
+                                                                lineNumber: 258,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -2227,51 +2249,51 @@ function HRInventory() {
                                                                         className: "w-4 h-4"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                        lineNumber: 268,
+                                                                        lineNumber: 280,
                                                                         columnNumber: 29
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                    lineNumber: 264,
+                                                                    lineNumber: 276,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                lineNumber: 263,
+                                                                lineNumber: 275,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, item.id, true, {
                                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                                        lineNumber: 230,
+                                                        lineNumber: 242,
                                                         columnNumber: 23
                                                     }, this);
                                                 })
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                                lineNumber: 226,
+                                                lineNumber: 238,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 214,
+                                        lineNumber: 226,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                    lineNumber: 213,
+                                    lineNumber: 225,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 212,
+                                lineNumber: 224,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/inventory/page.tsx",
-                        lineNumber: 207,
+                        lineNumber: 219,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -2282,7 +2304,7 @@ function HRInventory() {
                                         children: "Supply Requests from Staff & Dentists"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 283,
+                                        lineNumber: 295,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
@@ -2292,13 +2314,13 @@ function HRInventory() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 284,
+                                        lineNumber: 296,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 282,
+                                lineNumber: 294,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2309,7 +2331,7 @@ function HRInventory() {
                                         children: "No requests"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/inventory/page.tsx",
-                                        lineNumber: 291,
+                                        lineNumber: 303,
                                         columnNumber: 17
                                     }, this) : staffRequests.map((request)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: `p-4 border rounded-lg ${request.status === "pending" ? "border-yellow-200 bg-yellow-50/50" : request.status === "approved" ? "border-green-200 bg-green-50/50" : "border-red-200 bg-red-50/50"}`,
@@ -2324,7 +2346,7 @@ function HRInventory() {
                                                                     children: request.inventory?.name || "Unknown Item"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                    lineNumber: 306,
+                                                                    lineNumber: 318,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2335,13 +2357,13 @@ function HRInventory() {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                                    lineNumber: 307,
+                                                                    lineNumber: 319,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 305,
+                                                            lineNumber: 317,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2349,13 +2371,13 @@ function HRInventory() {
                                                             children: request.status.charAt(0).toUpperCase() + request.status.slice(1)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 311,
+                                                            lineNumber: 323,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                    lineNumber: 304,
+                                                    lineNumber: 316,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2366,7 +2388,7 @@ function HRInventory() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                    lineNumber: 323,
+                                                    lineNumber: 335,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2377,7 +2399,7 @@ function HRInventory() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                    lineNumber: 324,
+                                                    lineNumber: 336,
                                                     columnNumber: 21
                                                 }, this),
                                                 request.status === "pending" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2390,7 +2412,7 @@ function HRInventory() {
                                                             children: "Approve"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 329,
+                                                            lineNumber: 341,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -2401,41 +2423,41 @@ function HRInventory() {
                                                             children: "Reject"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                                            lineNumber: 336,
+                                                            lineNumber: 348,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                                    lineNumber: 328,
+                                                    lineNumber: 340,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, request.id, true, {
                                             fileName: "[project]/app/hr/inventory/page.tsx",
-                                            lineNumber: 294,
+                                            lineNumber: 306,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/inventory/page.tsx",
-                                    lineNumber: 289,
+                                    lineNumber: 301,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/inventory/page.tsx",
-                                lineNumber: 288,
+                                lineNumber: 300,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/inventory/page.tsx",
-                        lineNumber: 281,
+                        lineNumber: 293,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 127,
+                lineNumber: 139,
                 columnNumber: 7
             }, this),
             showAddModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modals$2f$add$2d$inventory$2d$item$2d$modal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2443,13 +2465,13 @@ function HRInventory() {
                 onSubmit: handleAddInventory
             }, void 0, false, {
                 fileName: "[project]/app/hr/inventory/page.tsx",
-                lineNumber: 354,
+                lineNumber: 366,
                 columnNumber: 24
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/hr/inventory/page.tsx",
-        lineNumber: 126,
+        lineNumber: 138,
         columnNumber: 5
     }, this);
 }
