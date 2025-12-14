@@ -1,6 +1,7 @@
 {
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
+  "/api/auth/quicklogins/route": "/api/auth/quicklogins",
   "/api/auth/register/route": "/api/auth/register",
   "/api/auth/update-password/route": "/api/auth/update-password",
   "/api/inventory/create/route": "/api/inventory/create",

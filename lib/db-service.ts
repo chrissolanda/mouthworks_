@@ -723,7 +723,7 @@ export const treatmentRecordService = {
 export const supplyRequestService = {
   async getAll() {
     const { data, error } = await getSupabase()
-      .from("supply_requests")
+      .from("supplyrequest")
       .select("*, inventory(name, category), staff(name)")
       .order("requested_date", { ascending: false })
     if (error) throw error
@@ -751,7 +751,7 @@ export const supplyRequestService = {
 
   async getPending() {
     const { data, error } = await getSupabase()
-      .from("supply_requests")
+      .from("supplyrequest")
       .select("*, inventory(name, category), staff(name)")
       .eq("status", "pending")
     if (error) throw error
@@ -780,7 +780,7 @@ export const supplyRequestService = {
   async create(request: any) {
     try {
       const { data, error } = await getSupabase()
-        .from("supply_requests")
+        .from("supplyrequest")
         .insert([request])
         .select("*, inventory(name, category), staff(name)")
         .single()
@@ -814,7 +814,7 @@ export const supplyRequestService = {
 
   async update(id: string, updates: any) {
     const { data, error } = await getSupabase()
-      .from("supply_requests")
+      .from("supplyrequest")
       .update({ ...updates, updated_at: new Date() })
       .eq("id", id)
       .select()

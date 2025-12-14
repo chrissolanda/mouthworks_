@@ -1206,7 +1206,7 @@ const treatmentRecordService = {
 };
 const supplyRequestService = {
     async getAll () {
-        const { data, error } = await getSupabase().from("supply_requests").select("*, inventory(name, category), staff(name)").order("requested_date", {
+        const { data, error } = await getSupabase().from("supplyrequest").select("*, inventory(name, category), staff(name)").order("requested_date", {
             ascending: false
         });
         if (error) throw error;
@@ -1232,7 +1232,7 @@ const supplyRequestService = {
         return data;
     },
     async getPending () {
-        const { data, error } = await getSupabase().from("supply_requests").select("*, inventory(name, category), staff(name)").eq("status", "pending");
+        const { data, error } = await getSupabase().from("supplyrequest").select("*, inventory(name, category), staff(name)").eq("status", "pending");
         if (error) throw error;
         // Try to fetch dentist info separately if dentist_id exists
         if (data && data.length > 0 && data[0].dentist_id) {
@@ -1257,7 +1257,7 @@ const supplyRequestService = {
     },
     async create (request) {
         try {
-            const { data, error } = await getSupabase().from("supply_requests").insert([
+            const { data, error } = await getSupabase().from("supplyrequest").insert([
                 request
             ]).select("*, inventory(name, category), staff(name)").single();
             if (error) {
@@ -1282,7 +1282,7 @@ const supplyRequestService = {
         }
     },
     async update (id, updates) {
-        const { data, error } = await getSupabase().from("supply_requests").update({
+        const { data, error } = await getSupabase().from("supplyrequest").update({
             ...updates,
             updated_at: new Date()
         }).eq("id", id).select().single();
@@ -3544,7 +3544,7 @@ function DentistDashboard() {
         columnNumber: 5
     }, this);
 }
-_s(DentistDashboard, "xN0/2YHwqVWUnFXCIv6bWHb9Vbo=", false, function() {
+_s(DentistDashboard, "Da8Wjr59aSyZAOr7qsBSTaj1OhM=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"]
     ];

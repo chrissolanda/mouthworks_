@@ -99,7 +99,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "C:\\Users\\Administrator\\Downloads\\im_mouthworks\\im_mouthworks\\im_mouthworks",
+    "outputFileTracingRoot": "C:\\Users\\Administrator\\Downloads\\mouthworks_",
     "cacheComponents": false,
     "cacheLife": {
       "default": {
@@ -289,11 +289,11 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.mjs",
     "turbopack": {
-      "root": "C:\\Users\\Administrator\\Downloads\\im_mouthworks\\im_mouthworks\\im_mouthworks"
+      "root": "C:\\Users\\Administrator\\Downloads\\mouthworks_"
     },
     "distDirRoot": ".next"
   },
-  "appDir": "C:\\Users\\Administrator\\Downloads\\im_mouthworks\\im_mouthworks\\im_mouthworks",
+  "appDir": "C:\\Users\\Administrator\\Downloads\\mouthworks_",
   "relativeAppDir": "",
   "files": [
     ".next\\routes-manifest.json",

@@ -40,6 +40,12 @@
       "namedRegex": "^/_not\\-found(?:/)?$"
     },
     {
+      "page": "/api/auth/quicklogins",
+      "regex": "^/api/auth/quicklogins(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/quicklogins(?:/)?$"
+    },
+    {
       "page": "/api/auth/register",
       "regex": "^/api/auth/register(?:/)?$",
       "routeKeys": {},
