@@ -49,6 +49,29 @@ export default function HRPatients() {
 
   useEffect(() => {
     loadPatients()
+    // Auto-refresh every 3 seconds to sync patients
+    const interval = setInterval(() => {
+      loadPatients()
+    }, 3000)
+    
+    // Listen for all data change events to refresh immediately
+    const handleDataChange = () => {
+      loadPatients()
+    }
+    
+    // Register listeners for all data change events
+    window.addEventListener('patientCreated', handleDataChange)
+    window.addEventListener('patientUpdated', handleDataChange)
+    window.addEventListener('patientDeleted', handleDataChange)
+    window.addEventListener('dataChanged', handleDataChange) // Generic catch-all
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('patientCreated', handleDataChange)
+      window.removeEventListener('patientUpdated', handleDataChange)
+      window.removeEventListener('patientDeleted', handleDataChange)
+      window.removeEventListener('dataChanged', handleDataChange)
+    }
   }, [])
 
   const loadPatients = async () => {
@@ -76,16 +99,22 @@ export default function HRPatients() {
 
   const handleAddPatient = async (data: any) => {
     try {
-      // Check for duplicate patient name
-      const existingPatient = await patientService.getByName(data.name)
+      // Check for duplicate patient email (not name - multiple patients can have the same name)
+      const existingPatient = await patientService.getByEmail(data.email)
       if (existingPatient) {
-        throw new Error(`Patient with name '${data.name}' already exists. Please use a different name.`)
+        throw new Error(`Patient with email '${data.email}' already exists. Please use a different email.`)
       }
 
       const newPatient = await patientService.create(data)
       if (newPatient) {
         setPatients([newPatient, ...patients])
         setShowAddModal(false)
+        
+        // Dispatch events to notify other pages
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('patientCreated'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }
       }
     } catch (error) {
       console.error("[v0] Error adding patient:", error)
@@ -98,6 +127,12 @@ export default function HRPatients() {
       try {
         await patientService.delete(id)
         setPatients(patients.filter((p) => p.id !== id))
+        
+        // Dispatch events to notify other pages
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('patientDeleted'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }
       } catch (error) {
         console.error("[v0] Error deleting patient:", error)
       }
@@ -124,6 +159,12 @@ export default function HRPatients() {
         setPatients(
           patients.map((p) => (p.id === selectedPatient!.id ? { ...p, ...submitData.data } : p))
         )
+        
+        // Dispatch events to notify other pages
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('patientUpdated'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }
       } else if (submitData.type === "password") {
         // Update password
         await authService.updatePassword(submitData.data.email, submitData.data.newPassword)

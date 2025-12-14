@@ -64,9 +64,9 @@ export default function PatientRegistrationModal({ onSubmit, userEmail }: Patien
     try {
       setLoading(true)
 
-      // Check if patient with this name already exists
+      // Check if patient with this email already exists (use email from userEmail prop if available)
       const { patientService, appointmentService } = await import("@/lib/db-service")
-      const existingPatient = await patientService.getByName(formData.name)
+      const existingPatient = userEmail ? await patientService.getByEmail(userEmail) : null
 
       if (existingPatient) {
         // Patient exists - fetch their appointments
@@ -78,8 +78,8 @@ export default function PatientRegistrationModal({ onSubmit, userEmail }: Patien
           setError(null)
           return
         } else {
-          // Patient exists but no appointments - show error
-          throw new Error(`Patient with name '${formData.name}' already exists. Please use a different name.`)
+          // Patient exists but no appointments - allow them to continue
+          // Don't block registration if patient already exists
         }
       }
 

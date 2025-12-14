@@ -22,10 +22,11 @@ import {
   AlertCircle,
   Download,
 } from "lucide-react"
-import { paymentService, patientService } from "@/lib/db-service"
+import { paymentService, patientService, appointmentService } from "@/lib/db-service"
 import { formatCurrency } from "@/lib/utils"
 import { downloadReceipt, type ReceiptData } from "@/lib/receipt-generator"
 import RecordPaymentModal from "@/components/modals/record-payment-modal"
+import AppointmentPaymentModal from "@/components/modals/appointment-payment-modal"
 
 interface EditingPaymentId {
   id: string | null
@@ -49,8 +50,11 @@ export default function HRPayments() {
   const { user } = useAuth()
   const [payments, setPayments] = useState<Payment[]>([])
   const [patients, setPatients] = useState<any[]>([])
+  const [completedAppointments, setCompletedAppointments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showRecordModal, setShowRecordModal] = useState(false)
+  const [showAppointmentPaymentModal, setShowAppointmentPaymentModal] = useState(false)
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
   const [filter, setFilter] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -63,30 +67,60 @@ export default function HRPayments() {
     const interval = setInterval(() => {
       loadData()
     }, 3000)
-    return () => clearInterval(interval)
+    
+    // Listen for all data change events to refresh immediately
+    const handleDataChange = () => {
+      loadData()
+    }
+    
+    // Register listeners for all data change events
+    window.addEventListener('paymentRecorded', handleDataChange)
+    window.addEventListener('paymentDeleted', handleDataChange)
+    window.addEventListener('appointmentUpdated', handleDataChange)
+    window.addEventListener('dataChanged', handleDataChange) // Generic catch-all
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('paymentRecorded', handleDataChange)
+      window.removeEventListener('paymentDeleted', handleDataChange)
+      window.removeEventListener('appointmentUpdated', handleDataChange)
+      window.removeEventListener('dataChanged', handleDataChange)
+    }
   }, [])
 
   const loadData = async () => {
     try {
-      console.log("[v0] 🔄 Loading payments and patients from database...")
+      console.log("[v0] 🔄 Loading payments, patients, and appointments from database...")
       setLoading(true)
       
-      const [paymentsData, patientsData] = await Promise.all([
+      const [paymentsData, patientsData, appointmentsData] = await Promise.all([
         paymentService.getAll(), 
-        patientService.getAll()
+        patientService.getAll(),
+        appointmentService.getAll()
       ])
       
       console.log("[v0] ✅ Loaded", paymentsData?.length || 0, "payments")
       console.log("[v0] ✅ Loaded", patientsData?.length || 0, "patients")
+      console.log("[v0] ✅ Loaded", appointmentsData?.length || 0, "appointments")
+      
+      // Filter completed appointments that don't have a payment yet
+      const completed = (appointmentsData || []).filter((apt: any) => {
+        if (apt.status !== "completed") return false
+        // Check if there's already a payment for this appointment
+        const hasPayment = (paymentsData || []).some((p: any) => p.appointment_id === apt.id)
+        return !hasPayment
+      })
       
       setPayments(paymentsData || [])
       setPatients(patientsData || [])
+      setCompletedAppointments(completed)
     } catch (error) {
       console.error("[v0] ❌ Error loading data:", error)
       console.error("[v0] Error details:", error instanceof Error ? error.message : error)
       // Set empty arrays on error to prevent UI crashes
       setPayments([])
       setPatients([])
+      setCompletedAppointments([])
     } finally {
       setLoading(false)
     }
@@ -116,14 +150,32 @@ export default function HRPayments() {
       
       console.log("[v0] ✅ Payment saved to database with ID:", newPayment.id)
       
+      // If payment is for an appointment, update appointment status to "paid"
+      if (data.appointment_id) {
+        try {
+          await appointmentService.update(data.appointment_id, { status: "paid" })
+          console.log("[v0] ✅ Appointment status updated to paid")
+        } catch (err) {
+          console.warn("[v0] Warning: Could not update appointment status:", err)
+        }
+      }
+      
       // Reload all data from database to ensure we have fresh data
       console.log("[v0] 🔄 Reloading all payments from database...")
       await loadData()
       
       console.log("[v0] ✅ Data reloaded successfully")
       
+      // Dispatch events to notify other pages
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('paymentRecorded'))
+        window.dispatchEvent(new CustomEvent('dataChanged'))
+      }
+      
       // Only close modal after everything is saved and loaded
       setShowRecordModal(false)
+      setShowAppointmentPaymentModal(false)
+      setSelectedAppointment(null)
       
       alert(`✅ Payment recorded successfully!\n\nAmount: ₱${data.amount}\nStatus: ${data.status}\n\nPayment is now visible in the system.`)
     } catch (error) {
@@ -133,11 +185,55 @@ export default function HRPayments() {
     }
   }
 
+  const handleRecordPaymentFromAppointment = async (paymentData: { method: string; amount: number; notes: string }): Promise<string> => {
+    if (!selectedAppointment) return ""
+    
+    try {
+      // Create payment record
+      const payment = await paymentService.create({
+        patient_id: selectedAppointment.patient_id,
+        dentist_id: selectedAppointment.dentist_id || "",
+        appointment_id: selectedAppointment.id,
+        amount: paymentData.amount,
+        method: paymentData.method,
+        status: "paid",
+        description: paymentData.notes,
+        date: new Date().toISOString().split("T")[0],
+      })
+      
+      // Update appointment status to "paid"
+      await appointmentService.update(selectedAppointment.id, {
+        status: "paid",
+      })
+      
+      // Reload data to reflect the change
+      await loadData()
+      
+      // Dispatch events to notify other pages
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('paymentRecorded'))
+        window.dispatchEvent(new CustomEvent('dataChanged'))
+      }
+      
+      // Return payment ID for receipt generation
+      return payment.id
+    } catch (error) {
+      console.error("[v0] Error recording payment:", error)
+      throw new Error("Failed to record payment: " + (error instanceof Error ? error.message : "Unknown error"))
+    }
+  }
+
   const handleDeletePayment = async (id: string) => {
     if (confirm("Are you sure you want to delete this payment record?")) {
       try {
         await paymentService.delete(id)
         setPayments(payments.filter((p) => p.id !== id))
+        
+        // Dispatch events to notify other pages
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('paymentDeleted'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }
       } catch (error) {
         console.error("[v0] Error deleting payment:", error)
         alert("Error deleting payment: " + (error instanceof Error ? error.message : "Unknown error"))
@@ -164,6 +260,12 @@ export default function HRPayments() {
   const handleEditPayment = async (id: string, field: string, value: any) => {
     try {
       const updatedPayment = await paymentService.update(id, { [field]: value })
+      
+      // Dispatch events to notify other pages
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('paymentUpdated'))
+        window.dispatchEvent(new CustomEvent('dataChanged'))
+      }
       setPayments(payments.map((p) => (p.id === id ? updatedPayment : p)))
       setEditingId(null)
       setEditField(null)
@@ -206,15 +308,66 @@ export default function HRPayments() {
             <Button onClick={loadData} variant="outline" size="sm">
               🔄 Refresh
             </Button>
-            <Button
-              onClick={() => setShowRecordModal(true)}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Record Payment
-            </Button>
           </div>
         </div>
+
+        {/* Completed Appointments Awaiting Payment */}
+        {completedAppointments.length > 0 && (
+          <Card className="border-green-300 bg-green-50/50 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-green-900">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                Completed Appointments - Ready for Payment ({completedAppointments.length})
+              </CardTitle>
+              <CardDescription className="text-green-700">
+                Click on any appointment to record payment
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {completedAppointments.map((apt) => (
+                  <button
+                    key={apt.id}
+                    onClick={() => {
+                      setSelectedAppointment(apt)
+                      setShowAppointmentPaymentModal(true)
+                    }}
+                    className="p-5 border-2 border-green-300 bg-white rounded-lg hover:bg-green-50 hover:border-green-500 transition-all text-left group"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <p className="font-bold text-lg text-foreground group-hover:text-primary">
+                          {apt.patients?.name || "Unknown Patient"}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          <span className="font-medium">{apt.service || "General Visit"}</span>
+                          {apt.dentists?.name && ` • Dr. ${apt.dentists.name}`}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-primary">{apt.date}</p>
+                        <p className="text-sm text-muted-foreground">{apt.time}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-3 border-t border-green-200">
+                      <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-1 rounded">
+                        ✓ COMPLETED
+                      </span>
+                      {apt.amount && (
+                        <span className="text-sm font-bold text-primary">
+                          Amount: {formatCurrency(apt.amount)}
+                        </span>
+                      )}
+                      <span className="text-sm font-bold text-primary group-hover:underline">
+                        Record Payment →
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Payment Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -412,6 +565,16 @@ export default function HRPayments() {
         <>
           {showRecordModal && (
             <RecordPaymentModal onClose={() => setShowRecordModal(false)} onSubmit={handleRecordPayment} />
+          )}
+          {showAppointmentPaymentModal && selectedAppointment && (
+            <AppointmentPaymentModal
+              appointment={selectedAppointment}
+              onClose={() => {
+                setShowAppointmentPaymentModal(false)
+                setSelectedAppointment(null)
+              }}
+              onRecordPayment={handleRecordPaymentFromAppointment}
+            />
           )}
         </>
       )}

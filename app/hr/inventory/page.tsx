@@ -44,6 +44,29 @@ export default function HRInventory() {
 
   useEffect(() => {
     loadData()
+    // Auto-refresh every 3 seconds to sync inventory
+    const interval = setInterval(() => {
+      loadData()
+    }, 3000)
+    
+    // Listen for all data change events to refresh immediately
+    const handleDataChange = () => {
+      loadData()
+    }
+    
+    // Register listeners for all data change events
+    window.addEventListener('inventoryCreated', handleDataChange)
+    window.addEventListener('inventoryUpdated', handleDataChange)
+    window.addEventListener('inventoryDeleted', handleDataChange)
+    window.addEventListener('dataChanged', handleDataChange) // Generic catch-all
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('inventoryCreated', handleDataChange)
+      window.removeEventListener('inventoryUpdated', handleDataChange)
+      window.removeEventListener('inventoryDeleted', handleDataChange)
+      window.removeEventListener('dataChanged', handleDataChange)
+    }
   }, [])
 
   const loadData = async () => {
@@ -57,9 +80,10 @@ export default function HRInventory() {
       // Calculate status based on quantity vs min_quantity
       const inventoryWithStatus = (inventoryData || []).map((item: any) => {
         let status = "ok"
+        const minQty = item.min_quantity || 0
         if (item.quantity <= 0) {
           status = "critical"
-        } else if (item.quantity <= item.min_quantity) {
+        } else if (item.min_quantity && item.quantity <= minQty) {
           status = "low"
         }
         return { ...item, status }
@@ -68,7 +92,12 @@ export default function HRInventory() {
       setInventory(inventoryWithStatus)
       setStaffRequests(requestsData || [])
     } catch (error) {
-      console.error("[v0] Error loading inventory:", error)
+      const errorMsg = error instanceof Error ? error.message : JSON.stringify(error)
+      console.error("[v0] Error loading inventory:", errorMsg)
+      console.error("[v0] Error details:", error)
+      // Set empty arrays on error to prevent UI issues
+      setInventory([])
+      setStaffRequests([])
     } finally {
       setLoading(false)
     }
@@ -90,6 +119,13 @@ export default function HRInventory() {
       const newItem = await inventoryService.create(data)
       setInventory([newItem, ...inventory])
       setShowAddModal(false)
+      
+      // Dispatch events to notify other pages
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('inventoryCreated'))
+        window.dispatchEvent(new CustomEvent('inventoryUpdated'))
+        window.dispatchEvent(new CustomEvent('dataChanged'))
+      }
     } catch (error) {
       // Log detailed error information in a safe way
       const errMsg = error instanceof Error ? error.message : JSON.stringify(error)
@@ -102,6 +138,13 @@ export default function HRInventory() {
       try {
         await inventoryService.delete(id)
         setInventory(inventory.filter((i) => i.id !== id))
+        
+        // Dispatch events to notify other pages
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('inventoryDeleted'))
+          window.dispatchEvent(new CustomEvent('inventoryUpdated'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }
       } catch (error) {
         console.error("[v0] Error deleting inventory:", error)
       }
@@ -198,6 +241,57 @@ export default function HRInventory() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Low Stock Alert Section */}
+        {lowStockItems.length > 0 && (
+          <Card className="border-yellow-300 bg-yellow-50/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-yellow-900">
+                <AlertCircle className="w-5 h-5 text-yellow-600" />
+                Low Stock Alert ({lowStockItems.length} item{lowStockItems.length !== 1 ? 's' : ''})
+              </CardTitle>
+              <CardDescription className="text-yellow-800">
+                These items are below minimum stock level and need restocking
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {lowStockItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`p-4 border-2 rounded-lg ${
+                      item.status === "critical"
+                        ? "border-red-300 bg-red-50/50"
+                        : "border-yellow-300 bg-white"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <p className="font-semibold text-foreground">{item.name}</p>
+                        <p className="text-sm text-muted-foreground">{item.category || "Uncategorized"}</p>
+                      </div>
+                      <div className="text-right mr-4">
+                        <p className="text-sm text-muted-foreground">Current: <span className="font-bold text-foreground">{item.quantity}</span></p>
+                        <p className="text-sm text-muted-foreground">Minimum: <span className="font-bold text-foreground">{item.min_quantity}</span></p>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                          item.status === "critical"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
+                        {item.status === "critical" && <AlertCircle className="w-3 h-3" />}
+                        {item.status === "low" && <TrendingDown className="w-3 h-3" />}
+                        {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Search */}
         <Card>

@@ -713,6 +713,28 @@ const appointmentService = {
     },
     async create (appointment) {
         try {
+            // #region agent log
+            const today = new Date().toISOString().split("T")[0];
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:224',
+                    message: 'DB service - before insert',
+                    data: {
+                        appointmentDate: appointment.date,
+                        today,
+                        patientId: appointment.patient_id
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] 💾 Creating appointment in database:", appointment);
             const { data, error } = await getSupabase().from("appointments").insert([
                 appointment
@@ -721,6 +743,28 @@ const appointmentService = {
                 console.error("[v0] ❌ Supabase error creating appointment:", error);
                 throw new Error(`Failed to create appointment: ${error.message}`);
             }
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:235',
+                    message: 'DB service - after insert',
+                    data: {
+                        submittedDate: appointment.date,
+                        savedDate: data?.date,
+                        today,
+                        patientName: data?.patients?.name
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] ✅ Appointment saved to database:", data);
             return data;
         } catch (err) {
@@ -1302,80 +1346,234 @@ function HRDashboard() {
     });
     const [todayAppointments, setTodayAppointments] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "HRDashboard.useEffect": ()=>{
-            const loadData = {
-                "HRDashboard.useEffect.loadData": async ()=>{
+    const loadData = async ()=>{
+        try {
+            console.log("[v0] Dashboard: Loading all data at", new Date().toISOString());
+            const [patients, appointments, payments, inventory] = await Promise.all([
+                __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["patientService"].getAll().catch(()=>[]),
+                __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["appointmentService"].getAll().catch(()=>[]),
+                __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["paymentService"].getAll().catch(()=>[]),
+                __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["inventoryService"].getAll().catch(()=>[])
+            ]);
+            // Get today's date in YYYY-MM-DD format - use local timezone to match user's date
+            const now = new Date();
+            const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            // #region agent log
+            const sampleDates = (appointments || []).slice(0, 5).map((a)=>({
+                    id: a.id,
+                    date: a.date,
+                    dateType: typeof a.date,
+                    patient: a.patients?.name
+                }));
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'app/hr/dashboard/page.tsx:52',
+                    message: 'Date filtering - sample dates',
+                    data: {
+                        today,
+                        appointmentsCount: appointments?.length || 0,
+                        sampleDates
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'dashboard-fix-v2',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
+            // Filter appointments for today - handle various date formats from database
+            const todayAppts = (appointments || []).filter((a)=>{
+                if (!a.date) return false;
+                // Normalize appointment date to YYYY-MM-DD format
+                let appointmentDate = "";
+                if (typeof a.date === 'string') {
+                    // Handle "YYYY-MM-DD" or "YYYY-MM-DDTHH:mm:ss" or "YYYY-MM-DDTHH:mm:ssZ"
+                    appointmentDate = a.date.split("T")[0].split(" ")[0];
+                } else if (a.date instanceof Date) {
+                    appointmentDate = `${a.date.getFullYear()}-${String(a.date.getMonth() + 1).padStart(2, '0')}-${String(a.date.getDate()).padStart(2, '0')}`;
+                } else {
+                    // Try to parse as date
                     try {
-                        const [patients, appointments, payments, inventory] = await Promise.all([
-                            __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["patientService"].getAll().catch({
-                                "HRDashboard.useEffect.loadData": ()=>[]
-                            }["HRDashboard.useEffect.loadData"]),
-                            __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["appointmentService"].getAll().catch({
-                                "HRDashboard.useEffect.loadData": ()=>[]
-                            }["HRDashboard.useEffect.loadData"]),
-                            __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["paymentService"].getAll().catch({
-                                "HRDashboard.useEffect.loadData": ()=>[]
-                            }["HRDashboard.useEffect.loadData"]),
-                            __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["inventoryService"].getAll().catch({
-                                "HRDashboard.useEffect.loadData": ()=>[]
-                            }["HRDashboard.useEffect.loadData"])
-                        ]);
-                        const today = new Date().toISOString().split("T")[0];
-                        const todayAppts = (appointments || []).filter({
-                            "HRDashboard.useEffect.loadData.todayAppts": (a)=>a.date === today
-                        }["HRDashboard.useEffect.loadData.todayAppts"]);
-                        const pendingPaymentsAmount = (payments || []).filter({
-                            "HRDashboard.useEffect.loadData.pendingPaymentsAmount": (p)=>p.status !== "paid"
-                        }["HRDashboard.useEffect.loadData.pendingPaymentsAmount"]).reduce({
-                            "HRDashboard.useEffect.loadData.pendingPaymentsAmount": (sum, p)=>sum + (p.amount || 0)
-                        }["HRDashboard.useEffect.loadData.pendingPaymentsAmount"], 0);
-                        const lowStockCount = (inventory || []).filter({
-                            "HRDashboard.useEffect.loadData": (i)=>i.status === "low" || i.status === "critical"
-                        }["HRDashboard.useEffect.loadData"]).length;
-                        // Appointment status counts
-                        const needAssignment = (appointments || []).filter({
-                            "HRDashboard.useEffect.loadData": (a)=>a.status === "pending" && !a.dentist_id
-                        }["HRDashboard.useEffect.loadData"]).length;
-                        const confirmed = (appointments || []).filter({
-                            "HRDashboard.useEffect.loadData": (a)=>a.status === "confirmed"
-                        }["HRDashboard.useEffect.loadData"]).length;
-                        const readyForPayment = (appointments || []).filter({
-                            "HRDashboard.useEffect.loadData": (a)=>a.status === "completed"
-                        }["HRDashboard.useEffect.loadData"]).length;
-                        const inProgress = (appointments || []).filter({
-                            "HRDashboard.useEffect.loadData": (a)=>a.status === "in-progress"
-                        }["HRDashboard.useEffect.loadData"]).length;
-                        setStats({
-                            totalPatients: patients?.length || 0,
-                            todayAppointments: todayAppts?.length || 0,
-                            pendingPayments: pendingPaymentsAmount || 0,
-                            lowStockItems: lowStockCount || 0,
-                            needDentistAssignment: needAssignment || 0,
-                            confirmedAppointments: confirmed || 0,
-                            readyForPayment: readyForPayment || 0,
-                            inProgress: inProgress || 0
-                        });
-                        setTodayAppointments((todayAppts || []).slice(0, 4));
-                    } catch (error) {
-                        console.error("[v0] Error loading dashboard:", error instanceof Error ? error.message : error);
-                        setStats({
-                            totalPatients: 0,
-                            todayAppointments: 0,
-                            pendingPayments: 0,
-                            lowStockItems: 0,
-                            needDentistAssignment: 0,
-                            confirmedAppointments: 0,
-                            readyForPayment: 0,
-                            inProgress: 0
-                        });
-                        setTodayAppointments([]);
-                    } finally{
-                        setLoading(false);
+                        const dateObj = new Date(a.date);
+                        appointmentDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+                    } catch  {
+                        return false;
                     }
                 }
-            }["HRDashboard.useEffect.loadData"];
+                const matches = appointmentDate === today;
+                // #region agent log
+                if (matches) {
+                    fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            location: 'app/hr/dashboard/page.tsx:75',
+                            message: 'MATCH - Appointment for today',
+                            data: {
+                                appointmentId: a.id,
+                                appointmentDate,
+                                today,
+                                patientName: a.patients?.name,
+                                originalDate: a.date
+                            },
+                            timestamp: Date.now(),
+                            sessionId: 'debug-session',
+                            runId: 'dashboard-fix-v2',
+                            hypothesisId: 'A'
+                        })
+                    }).catch(()=>{});
+                }
+                // #endregion
+                return matches;
+            });
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'app/hr/dashboard/page.tsx:85',
+                    message: 'Today appointments result',
+                    data: {
+                        todayApptsCount: todayAppts.length,
+                        today,
+                        allAppointmentsCount: appointments?.length || 0
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'dashboard-fix-v2',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
+            const pendingPaymentsAmount = (payments || []).filter((p)=>p.status !== "paid").reduce((sum, p)=>sum + (p.amount || 0), 0);
+            const lowStockCount = (inventory || []).filter((i)=>i.status === "low" || i.status === "critical").length;
+            // Appointment status counts
+            // Only count pending appointments that need dentist assignment
+            // Explicitly exclude completed, paid, cancelled, and rejected statuses
+            const needAssignment = (appointments || []).filter((a)=>{
+                const status = a.status?.toLowerCase() || "";
+                return status === "pending" && !a.dentist_id;
+            }).length;
+            const confirmed = (appointments || []).filter((a)=>a.status === "confirmed").length;
+            const readyForPayment = (appointments || []).filter((a)=>a.status === "completed").length;
+            const inProgress = (appointments || []).filter((a)=>a.status === "in-progress").length;
+            setStats({
+                totalPatients: patients?.length || 0,
+                todayAppointments: todayAppts?.length || 0,
+                pendingPayments: pendingPaymentsAmount || 0,
+                lowStockItems: lowStockCount || 0,
+                needDentistAssignment: needAssignment || 0,
+                confirmedAppointments: confirmed || 0,
+                readyForPayment: readyForPayment || 0,
+                inProgress: inProgress || 0
+            });
+            setTodayAppointments((todayAppts || []).slice(0, 4));
+            console.log("[v0] Dashboard: Data loaded successfully at", new Date().toISOString());
+            console.log("[v0] Dashboard: Stats - needAssignment:", needAssignment, "pendingPayments:", pendingPaymentsAmount, "todayAppts:", todayAppts.length, "total appointments:", appointments?.length);
+        } catch (error) {
+            console.error("[v0] Error loading dashboard:", error instanceof Error ? error.message : error);
+            setStats({
+                totalPatients: 0,
+                todayAppointments: 0,
+                pendingPayments: 0,
+                lowStockItems: 0,
+                needDentistAssignment: 0,
+                confirmedAppointments: 0,
+                readyForPayment: 0,
+                inProgress: 0
+            });
+            setTodayAppointments([]);
+        } finally{
+            setLoading(false);
+        }
+    };
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "HRDashboard.useEffect": ()=>{
             loadData();
+            // Auto-refresh every 3 seconds to sync all data
+            const interval = setInterval({
+                "HRDashboard.useEffect.interval": ()=>{
+                    loadData();
+                }
+            }["HRDashboard.useEffect.interval"], 3000);
+            // Listen for all data change events to refresh immediately
+            const handleDataChange = {
+                "HRDashboard.useEffect.handleDataChange": (event)=>{
+                    const eventName = event?.type || 'unknown';
+                    console.log(`[v0] Dashboard: Data change event received (${eventName}), refreshing immediately...`);
+                    // Force immediate refresh on any data change - no debounce, instant sync
+                    loadData().catch({
+                        "HRDashboard.useEffect.handleDataChange": (err)=>{
+                            console.error("[v0] Dashboard: Error during sync refresh:", err);
+                        }
+                    }["HRDashboard.useEffect.handleDataChange"]);
+                }
+            }["HRDashboard.useEffect.handleDataChange"];
+            // Also listen to storage events (for cross-tab sync)
+            const handleStorageChange = {
+                "HRDashboard.useEffect.handleStorageChange": (e)=>{
+                    if (e.key === 'dataChanged') {
+                        console.log("[v0] Dashboard: Storage event detected, refreshing...");
+                        loadData().catch({
+                            "HRDashboard.useEffect.handleStorageChange": (err)=>{
+                                console.error("[v0] Dashboard: Error during storage sync refresh:", err);
+                            }
+                        }["HRDashboard.useEffect.handleStorageChange"]);
+                    }
+                }
+            }["HRDashboard.useEffect.handleStorageChange"];
+            window.addEventListener('storage', handleStorageChange);
+            // Register listeners for ALL possible data change events
+            const events = [
+                'appointmentCreated',
+                'appointmentUpdated',
+                'appointmentDeleted',
+                'paymentRecorded',
+                'paymentDeleted',
+                'paymentUpdated',
+                'inventoryUpdated',
+                'inventoryCreated',
+                'inventoryDeleted',
+                'patientCreated',
+                'patientUpdated',
+                'patientDeleted',
+                'treatmentCreated',
+                'treatmentUpdated',
+                'treatmentDeleted',
+                'dentistCreated',
+                'dentistUpdated',
+                'dentistDeleted',
+                'staffCreated',
+                'staffUpdated',
+                'staffDeleted',
+                'dataChanged' // Generic catch-all - must be last
+            ];
+            // Add all event listeners
+            events.forEach({
+                "HRDashboard.useEffect": (event)=>{
+                    window.addEventListener(event, handleDataChange);
+                }
+            }["HRDashboard.useEffect"]);
+            return ({
+                "HRDashboard.useEffect": ()=>{
+                    clearInterval(interval);
+                    // Remove all event listeners
+                    events.forEach({
+                        "HRDashboard.useEffect": (event)=>{
+                            window.removeEventListener(event, handleDataChange);
+                        }
+                    }["HRDashboard.useEffect"]);
+                    window.removeEventListener('storage', handleStorageChange);
+                }
+            })["HRDashboard.useEffect"];
         }
     }["HRDashboard.useEffect"], []);
     const navItems = [
@@ -1385,7 +1583,7 @@ function HRDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                lineNumber: 95,
+                lineNumber: 210,
                 columnNumber: 33
             }, this),
             href: "/hr/dashboard"
@@ -1396,7 +1594,7 @@ function HRDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                lineNumber: 96,
+                lineNumber: 211,
                 columnNumber: 32
             }, this),
             href: "/hr/patients"
@@ -1407,7 +1605,7 @@ function HRDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                lineNumber: 97,
+                lineNumber: 212,
                 columnNumber: 36
             }, this),
             href: "/hr/appointments"
@@ -1418,7 +1616,7 @@ function HRDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                lineNumber: 98,
+                lineNumber: 213,
                 columnNumber: 34
             }, this),
             href: "/hr/treatments"
@@ -1429,7 +1627,7 @@ function HRDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                lineNumber: 99,
+                lineNumber: 214,
                 columnNumber: 32
             }, this),
             href: "/hr/payments"
@@ -1440,7 +1638,7 @@ function HRDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                lineNumber: 100,
+                lineNumber: 215,
                 columnNumber: 33
             }, this),
             href: "/hr/inventory"
@@ -1451,7 +1649,7 @@ function HRDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                lineNumber: 101,
+                lineNumber: 216,
                 columnNumber: 31
             }, this),
             href: "/hr/reports"
@@ -1462,7 +1660,7 @@ function HRDashboard() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                lineNumber: 102,
+                lineNumber: 217,
                 columnNumber: 32
             }, this),
             href: "/hr/settings"
@@ -1485,7 +1683,7 @@ function HRDashboard() {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 110,
+                            lineNumber: 225,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1493,13 +1691,13 @@ function HRDashboard() {
                             children: "Manage clinic operations and schedule appointments"
                         }, void 0, false, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 111,
+                            lineNumber: 226,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                    lineNumber: 109,
+                    lineNumber: 224,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1515,12 +1713,12 @@ function HRDashboard() {
                                         children: "Total Patients"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 118,
+                                        lineNumber: 233,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 117,
+                                    lineNumber: 232,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1530,7 +1728,7 @@ function HRDashboard() {
                                             children: stats.totalPatients
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 121,
+                                            lineNumber: 236,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1538,19 +1736,19 @@ function HRDashboard() {
                                             children: "Active patients"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 122,
+                                            lineNumber: 237,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 120,
+                                    lineNumber: 235,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 116,
+                            lineNumber: 231,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -1563,12 +1761,12 @@ function HRDashboard() {
                                         children: "Today's Appointments"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 128,
+                                        lineNumber: 243,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 127,
+                                    lineNumber: 242,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1578,7 +1776,7 @@ function HRDashboard() {
                                             children: stats.todayAppointments
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 131,
+                                            lineNumber: 246,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1586,19 +1784,19 @@ function HRDashboard() {
                                             children: "Scheduled today"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 132,
+                                            lineNumber: 247,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 130,
+                                    lineNumber: 245,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 126,
+                            lineNumber: 241,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -1611,12 +1809,12 @@ function HRDashboard() {
                                         children: "Pending Payments"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 138,
+                                        lineNumber: 253,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 137,
+                                    lineNumber: 252,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1626,7 +1824,7 @@ function HRDashboard() {
                                             children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatCurrency"])(stats.pendingPayments)
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 141,
+                                            lineNumber: 256,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1634,19 +1832,19 @@ function HRDashboard() {
                                             children: "Unpaid invoices"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 142,
+                                            lineNumber: 257,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 140,
+                                    lineNumber: 255,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 136,
+                            lineNumber: 251,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -1659,12 +1857,12 @@ function HRDashboard() {
                                         children: "Low Stock Items"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 148,
+                                        lineNumber: 263,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 147,
+                                    lineNumber: 262,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1674,7 +1872,7 @@ function HRDashboard() {
                                             children: stats.lowStockItems
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 151,
+                                            lineNumber: 266,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1682,25 +1880,25 @@ function HRDashboard() {
                                             children: "Need restocking"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 152,
+                                            lineNumber: 267,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 150,
+                                    lineNumber: 265,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 146,
+                            lineNumber: 261,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                    lineNumber: 115,
+                    lineNumber: 230,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -1715,27 +1913,27 @@ function HRDashboard() {
                                             className: "w-6 h-6 text-primary"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 161,
+                                            lineNumber: 276,
                                             columnNumber: 15
                                         }, this),
                                         "Appointment Status Overview"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 160,
+                                    lineNumber: 275,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardDescription"], {
                                     children: "Quick view of all appointment states"
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 164,
+                                    lineNumber: 279,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 159,
+                            lineNumber: 274,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1755,7 +1953,7 @@ function HRDashboard() {
                                                             children: "Need Dentist"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                            lineNumber: 171,
+                                                            lineNumber: 286,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1764,18 +1962,18 @@ function HRDashboard() {
                                                                 className: "w-4 h-4 text-red-600"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 288,
                                                                 columnNumber: 23
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                            lineNumber: 172,
+                                                            lineNumber: 287,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 170,
+                                                    lineNumber: 285,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1783,7 +1981,7 @@ function HRDashboard() {
                                                     children: stats.needDentistAssignment
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 176,
+                                                    lineNumber: 291,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1791,18 +1989,18 @@ function HRDashboard() {
                                                     children: "Awaiting assignment"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 177,
+                                                    lineNumber: 292,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 169,
+                                            lineNumber: 284,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 168,
+                                        lineNumber: 283,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1818,7 +2016,7 @@ function HRDashboard() {
                                                             children: "Confirmed"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                            lineNumber: 184,
+                                                            lineNumber: 299,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1827,18 +2025,18 @@ function HRDashboard() {
                                                                 className: "w-4 h-4 text-purple-600"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                                lineNumber: 186,
+                                                                lineNumber: 301,
                                                                 columnNumber: 23
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                            lineNumber: 185,
+                                                            lineNumber: 300,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 183,
+                                                    lineNumber: 298,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1846,7 +2044,7 @@ function HRDashboard() {
                                                     children: stats.confirmedAppointments
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 189,
+                                                    lineNumber: 304,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1854,18 +2052,18 @@ function HRDashboard() {
                                                     children: "Ready for check-in"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 190,
+                                                    lineNumber: 305,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 182,
+                                            lineNumber: 297,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 181,
+                                        lineNumber: 296,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1881,7 +2079,7 @@ function HRDashboard() {
                                                             children: "In Progress"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                            lineNumber: 197,
+                                                            lineNumber: 312,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1890,18 +2088,18 @@ function HRDashboard() {
                                                                 className: "w-4 h-4 text-orange-600"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                                lineNumber: 199,
+                                                                lineNumber: 314,
                                                                 columnNumber: 23
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                            lineNumber: 198,
+                                                            lineNumber: 313,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 196,
+                                                    lineNumber: 311,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1909,7 +2107,7 @@ function HRDashboard() {
                                                     children: stats.inProgress
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 202,
+                                                    lineNumber: 317,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1917,18 +2115,18 @@ function HRDashboard() {
                                                     children: "Treatment ongoing"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 203,
+                                                    lineNumber: 318,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 195,
+                                            lineNumber: 310,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 194,
+                                        lineNumber: 309,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1944,7 +2142,7 @@ function HRDashboard() {
                                                             children: "Ready for Payment"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                            lineNumber: 210,
+                                                            lineNumber: 325,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1953,18 +2151,18 @@ function HRDashboard() {
                                                                 className: "w-4 h-4 text-green-600"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                                lineNumber: 212,
+                                                                lineNumber: 327,
                                                                 columnNumber: 23
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                            lineNumber: 211,
+                                                            lineNumber: 326,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 209,
+                                                    lineNumber: 324,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1972,7 +2170,7 @@ function HRDashboard() {
                                                     children: stats.readyForPayment
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 215,
+                                                    lineNumber: 330,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1980,35 +2178,35 @@ function HRDashboard() {
                                                     children: "Completed appointments"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 216,
+                                                    lineNumber: 331,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 208,
+                                            lineNumber: 323,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 207,
+                                        lineNumber: 322,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                lineNumber: 167,
+                                lineNumber: 282,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 166,
+                            lineNumber: 281,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                    lineNumber: 158,
+                    lineNumber: 273,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2031,12 +2229,12 @@ function HRDashboard() {
                                                         className: "w-5 h-5 text-primary"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                        lineNumber: 230,
+                                                        lineNumber: 345,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 229,
+                                                    lineNumber: 344,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
@@ -2044,18 +2242,18 @@ function HRDashboard() {
                                                     children: "New Appointment"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 232,
+                                                    lineNumber: 347,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 228,
+                                            lineNumber: 343,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 227,
+                                        lineNumber: 342,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2064,23 +2262,23 @@ function HRDashboard() {
                                             children: "Schedule appointment with dentist"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 236,
+                                            lineNumber: 351,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 235,
+                                        lineNumber: 350,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                lineNumber: 226,
+                                lineNumber: 341,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 225,
+                            lineNumber: 340,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2100,12 +2298,12 @@ function HRDashboard() {
                                                         className: "w-5 h-5 text-primary"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                        lineNumber: 246,
+                                                        lineNumber: 361,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 245,
+                                                    lineNumber: 360,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
@@ -2113,18 +2311,18 @@ function HRDashboard() {
                                                     children: "New Patient"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 248,
+                                                    lineNumber: 363,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 244,
+                                            lineNumber: 359,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 243,
+                                        lineNumber: 358,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2133,23 +2331,23 @@ function HRDashboard() {
                                             children: "Register new patient in system"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 252,
+                                            lineNumber: 367,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 251,
+                                        lineNumber: 366,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                lineNumber: 242,
+                                lineNumber: 357,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 241,
+                            lineNumber: 356,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2169,12 +2367,12 @@ function HRDashboard() {
                                                         className: "w-5 h-5 text-primary"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                        lineNumber: 262,
+                                                        lineNumber: 377,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 261,
+                                                    lineNumber: 376,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
@@ -2182,18 +2380,18 @@ function HRDashboard() {
                                                     children: "Record Payment"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                    lineNumber: 264,
+                                                    lineNumber: 379,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 260,
+                                            lineNumber: 375,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 259,
+                                        lineNumber: 374,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2202,29 +2400,29 @@ function HRDashboard() {
                                             children: "Log patient payment"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                                            lineNumber: 268,
+                                            lineNumber: 383,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 267,
+                                        lineNumber: 382,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                lineNumber: 258,
+                                lineNumber: 373,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 257,
+                            lineNumber: 372,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                    lineNumber: 224,
+                    lineNumber: 339,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -2237,7 +2435,7 @@ function HRDashboard() {
                                     children: "Today's Appointments"
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 277,
+                                    lineNumber: 392,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardDescription"], {
@@ -2245,13 +2443,13 @@ function HRDashboard() {
                                     children: "All appointments scheduled for today"
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                                    lineNumber: 278,
+                                    lineNumber: 393,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 276,
+                            lineNumber: 391,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2260,14 +2458,14 @@ function HRDashboard() {
                                 children: "Loading..."
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                lineNumber: 282,
+                                lineNumber: 397,
                                 columnNumber: 15
                             }, this) : todayAppointments.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "text-center py-4 text-muted-foreground",
                                 children: "No appointments today"
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                lineNumber: 284,
+                                lineNumber: 399,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-3",
@@ -2281,7 +2479,7 @@ function HRDashboard() {
                                                         className: "w-2 h-2 rounded-full bg-primary"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                        lineNumber: 293,
+                                                        lineNumber: 408,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2291,7 +2489,7 @@ function HRDashboard() {
                                                                 children: apt.patients?.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                                lineNumber: 295,
+                                                                lineNumber: 410,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2303,19 +2501,19 @@ function HRDashboard() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                                lineNumber: 296,
+                                                                lineNumber: 411,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                        lineNumber: 294,
+                                                        lineNumber: 409,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                lineNumber: 292,
+                                                lineNumber: 407,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2326,63 +2524,63 @@ function HRDashboard() {
                                                         children: apt.dentists?.name || "TBD"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                        lineNumber: 302,
+                                                        lineNumber: 417,
                                                         columnNumber: 23
                                                     }, this),
                                                     apt.status === "confirmed" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2d$big$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle$3e$__["CheckCircle"], {
                                                         className: "w-4 h-4 text-green-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                        lineNumber: 304,
+                                                        lineNumber: 419,
                                                         columnNumber: 25
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$clock$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Clock$3e$__["Clock"], {
                                                         className: "w-4 h-4 text-yellow-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                        lineNumber: 306,
+                                                        lineNumber: 421,
                                                         columnNumber: 25
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                                lineNumber: 301,
+                                                lineNumber: 416,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, apt.id, true, {
                                         fileName: "[project]/app/hr/dashboard/page.tsx",
-                                        lineNumber: 288,
+                                        lineNumber: 403,
                                         columnNumber: 19
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/dashboard/page.tsx",
-                                lineNumber: 286,
+                                lineNumber: 401,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/dashboard/page.tsx",
-                            lineNumber: 280,
+                            lineNumber: 395,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/hr/dashboard/page.tsx",
-                    lineNumber: 275,
+                    lineNumber: 390,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/hr/dashboard/page.tsx",
-            lineNumber: 107,
+            lineNumber: 222,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/hr/dashboard/page.tsx",
-        lineNumber: 106,
+        lineNumber: 221,
         columnNumber: 5
     }, this);
 }
-_s(HRDashboard, "4bWwbRbXUOj9Ab6EpvKz+Gci7uc=", false, function() {
+_s(HRDashboard, "Ai7zfSz8oITyt/3O/YyVJVg+e78=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"]
     ];

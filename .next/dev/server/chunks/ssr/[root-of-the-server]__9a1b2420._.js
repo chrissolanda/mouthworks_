@@ -716,6 +716,28 @@ const appointmentService = {
     },
     async create (appointment) {
         try {
+            // #region agent log
+            const today = new Date().toISOString().split("T")[0];
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:224',
+                    message: 'DB service - before insert',
+                    data: {
+                        appointmentDate: appointment.date,
+                        today,
+                        patientId: appointment.patient_id
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] 💾 Creating appointment in database:", appointment);
             const { data, error } = await getSupabase().from("appointments").insert([
                 appointment
@@ -724,6 +746,28 @@ const appointmentService = {
                 console.error("[v0] ❌ Supabase error creating appointment:", error);
                 throw new Error(`Failed to create appointment: ${error.message}`);
             }
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:235',
+                    message: 'DB service - after insert',
+                    data: {
+                        submittedDate: appointment.date,
+                        savedDate: data?.date,
+                        today,
+                        patientName: data?.patients?.name
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] ✅ Appointment saved to database:", data);
             return data;
         } catch (err) {
@@ -1620,6 +1664,26 @@ function HRTreatments() {
     const [searchTerm, setSearchTerm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         loadTreatments();
+        // Auto-refresh every 3 seconds to sync treatments
+        const interval = setInterval(()=>{
+            loadTreatments();
+        }, 3000);
+        // Listen for all data change events to refresh immediately
+        const handleDataChange = ()=>{
+            loadTreatments();
+        };
+        // Register listeners for all data change events
+        window.addEventListener('treatmentCreated', handleDataChange);
+        window.addEventListener('treatmentUpdated', handleDataChange);
+        window.addEventListener('treatmentDeleted', handleDataChange);
+        window.addEventListener('dataChanged', handleDataChange); // Generic catch-all
+        return ()=>{
+            clearInterval(interval);
+            window.removeEventListener('treatmentCreated', handleDataChange);
+            window.removeEventListener('treatmentUpdated', handleDataChange);
+            window.removeEventListener('treatmentDeleted', handleDataChange);
+            window.removeEventListener('dataChanged', handleDataChange);
+        };
     }, []);
     const loadTreatments = async ()=>{
         try {
@@ -1639,7 +1703,7 @@ function HRTreatments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 61,
+                lineNumber: 84,
                 columnNumber: 33
             }, this),
             href: "/hr/dashboard"
@@ -1650,7 +1714,7 @@ function HRTreatments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 62,
+                lineNumber: 85,
                 columnNumber: 32
             }, this),
             href: "/hr/patients"
@@ -1661,7 +1725,7 @@ function HRTreatments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 63,
+                lineNumber: 86,
                 columnNumber: 36
             }, this),
             href: "/hr/appointments"
@@ -1672,7 +1736,7 @@ function HRTreatments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 64,
+                lineNumber: 87,
                 columnNumber: 34
             }, this),
             href: "/hr/treatments"
@@ -1683,7 +1747,7 @@ function HRTreatments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 65,
+                lineNumber: 88,
                 columnNumber: 32
             }, this),
             href: "/hr/payments"
@@ -1694,7 +1758,7 @@ function HRTreatments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 66,
+                lineNumber: 89,
                 columnNumber: 33
             }, this),
             href: "/hr/inventory"
@@ -1705,7 +1769,7 @@ function HRTreatments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 67,
+                lineNumber: 90,
                 columnNumber: 31
             }, this),
             href: "/hr/reports"
@@ -1716,7 +1780,7 @@ function HRTreatments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 68,
+                lineNumber: 91,
                 columnNumber: 32
             }, this),
             href: "/hr/settings"
@@ -1731,6 +1795,9 @@ function HRTreatments() {
                 setTreatments(treatments.map((t)=>t.id === editingTreatment.id ? updated : t));
                 setEditingTreatment(null);
                 console.log("[v0] ✅ Treatment updated successfully");
+                // Dispatch events to notify other pages
+                if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+                ;
             } else {
                 console.log("[v0] ➕ Creating new treatment");
                 const newTreatment = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["treatmentService"].create(data);
@@ -1742,6 +1809,9 @@ function HRTreatments() {
                     ...treatments
                 ]);
                 console.log("[v0] ✅ Treatment created successfully with ID:", newTreatment.id);
+                // Dispatch events to notify other pages
+                if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+                ;
             }
             setShowAddModal(false);
             await loadTreatments(); // Reload to ensure fresh data
@@ -1759,6 +1829,9 @@ function HRTreatments() {
             try {
                 await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["treatmentService"].delete(id);
                 setTreatments(treatments.filter((t)=>t.id !== id));
+                // Dispatch events to notify other pages
+                if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+                ;
             } catch (error) {
                 console.error("[v0] Error deleting treatment:", error);
             }
@@ -1789,7 +1862,7 @@ function HRTreatments() {
                                         children: "Manage Treatments & Services"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 137,
+                                        lineNumber: 178,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1797,13 +1870,13 @@ function HRTreatments() {
                                         children: "Add, edit, and manage dental services offered at the clinic"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 138,
+                                        lineNumber: 179,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                lineNumber: 136,
+                                lineNumber: 177,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1817,20 +1890,20 @@ function HRTreatments() {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 147,
+                                        lineNumber: 188,
                                         columnNumber: 13
                                     }, this),
                                     "Add Treatment"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                lineNumber: 140,
+                                lineNumber: 181,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/treatments/page.tsx",
-                        lineNumber: 135,
+                        lineNumber: 176,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1843,7 +1916,7 @@ function HRTreatments() {
                                         className: "absolute left-3 top-2.5 w-4 h-4 text-muted-foreground"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 156,
+                                        lineNumber: 197,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -1854,23 +1927,23 @@ function HRTreatments() {
                                         className: "pl-10 border-border"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 157,
+                                        lineNumber: 198,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                lineNumber: 155,
+                                lineNumber: 196,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/treatments/page.tsx",
-                            lineNumber: 154,
+                            lineNumber: 195,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/hr/treatments/page.tsx",
-                        lineNumber: 153,
+                        lineNumber: 194,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1887,12 +1960,12 @@ function HRTreatments() {
                                 children: category
                             }, category, false, {
                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                lineNumber: 171,
+                                lineNumber: 212,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/app/hr/treatments/page.tsx",
-                        lineNumber: 169,
+                        lineNumber: 210,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1904,12 +1977,12 @@ function HRTreatments() {
                                 children: "No treatments found"
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                lineNumber: 192,
+                                lineNumber: 233,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/treatments/page.tsx",
-                            lineNumber: 191,
+                            lineNumber: 232,
                             columnNumber: 13
                         }, this) : filteredTreatments.map((treatment)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
                                 className: "hover:shadow-md transition-shadow hover:border-primary",
@@ -1927,7 +2000,7 @@ function HRTreatments() {
                                                             children: treatment.name
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/treatments/page.tsx",
-                                                            lineNumber: 200,
+                                                            lineNumber: 241,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
@@ -1937,20 +2010,20 @@ function HRTreatments() {
                                                                     className: "w-3 h-3"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/treatments/page.tsx",
-                                                                    lineNumber: 202,
+                                                                    lineNumber: 243,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 treatment.category
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/treatments/page.tsx",
-                                                            lineNumber: 201,
+                                                            lineNumber: 242,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/treatments/page.tsx",
-                                                    lineNumber: 199,
+                                                    lineNumber: 240,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1963,12 +2036,12 @@ function HRTreatments() {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                                lineNumber: 211,
+                                                                lineNumber: 252,
                                                                 columnNumber: 25
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/treatments/page.tsx",
-                                                            lineNumber: 207,
+                                                            lineNumber: 248,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1978,29 +2051,29 @@ function HRTreatments() {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                                lineNumber: 217,
+                                                                lineNumber: 258,
                                                                 columnNumber: 25
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/treatments/page.tsx",
-                                                            lineNumber: 213,
+                                                            lineNumber: 254,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/treatments/page.tsx",
-                                                    lineNumber: 206,
+                                                    lineNumber: 247,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/hr/treatments/page.tsx",
-                                            lineNumber: 198,
+                                            lineNumber: 239,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 238,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2011,7 +2084,7 @@ function HRTreatments() {
                                                 children: treatment.description || "No description"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                lineNumber: 223,
+                                                lineNumber: 264,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2022,7 +2095,7 @@ function HRTreatments() {
                                                         children: "Price"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                                        lineNumber: 225,
+                                                        lineNumber: 266,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2030,30 +2103,30 @@ function HRTreatments() {
                                                         children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatCurrency"])(treatment.price)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                                        lineNumber: 226,
+                                                        lineNumber: 267,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                lineNumber: 224,
+                                                lineNumber: 265,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 222,
+                                        lineNumber: 263,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, treatment.id, true, {
                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                lineNumber: 196,
+                                lineNumber: 237,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/app/hr/treatments/page.tsx",
-                        lineNumber: 189,
+                        lineNumber: 230,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2069,12 +2142,12 @@ function HRTreatments() {
                                             children: "Total Services"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/treatments/page.tsx",
-                                            lineNumber: 238,
+                                            lineNumber: 279,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 237,
+                                        lineNumber: 278,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2084,7 +2157,7 @@ function HRTreatments() {
                                                 children: treatments.length
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                lineNumber: 241,
+                                                lineNumber: 282,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2092,19 +2165,19 @@ function HRTreatments() {
                                                 children: "Services available"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                lineNumber: 242,
+                                                lineNumber: 283,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 240,
+                                        lineNumber: 281,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                lineNumber: 236,
+                                lineNumber: 277,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -2117,12 +2190,12 @@ function HRTreatments() {
                                             children: "Avg Price"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/treatments/page.tsx",
-                                            lineNumber: 248,
+                                            lineNumber: 289,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 247,
+                                        lineNumber: 288,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2132,7 +2205,7 @@ function HRTreatments() {
                                                 children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["formatCurrency"])(treatments.length > 0 ? treatments.reduce((sum, t)=>sum + (t.price || 0), 0) / treatments.length : 0)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                lineNumber: 251,
+                                                lineNumber: 292,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2140,19 +2213,19 @@ function HRTreatments() {
                                                 children: "Per service"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                lineNumber: 256,
+                                                lineNumber: 297,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 250,
+                                        lineNumber: 291,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                lineNumber: 246,
+                                lineNumber: 287,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -2165,12 +2238,12 @@ function HRTreatments() {
                                             children: "Categories"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/treatments/page.tsx",
-                                            lineNumber: 262,
+                                            lineNumber: 303,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 261,
+                                        lineNumber: 302,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2180,7 +2253,7 @@ function HRTreatments() {
                                                 children: categories.length
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                lineNumber: 265,
+                                                lineNumber: 306,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2188,31 +2261,31 @@ function HRTreatments() {
                                                 children: "Service categories"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                                lineNumber: 266,
+                                                lineNumber: 307,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/treatments/page.tsx",
-                                        lineNumber: 264,
+                                        lineNumber: 305,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/treatments/page.tsx",
-                                lineNumber: 260,
+                                lineNumber: 301,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/treatments/page.tsx",
-                        lineNumber: 235,
+                        lineNumber: 276,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 133,
+                lineNumber: 174,
                 columnNumber: 7
             }, this),
             showAddModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modals$2f$add$2d$treatment$2d$service$2d$modal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2224,13 +2297,13 @@ function HRTreatments() {
                 onSubmit: handleAddTreatment
             }, void 0, false, {
                 fileName: "[project]/app/hr/treatments/page.tsx",
-                lineNumber: 273,
+                lineNumber: 314,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/hr/treatments/page.tsx",
-        lineNumber: 132,
+        lineNumber: 173,
         columnNumber: 5
     }, this);
 }

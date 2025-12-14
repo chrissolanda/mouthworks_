@@ -57,6 +57,43 @@ export default function HRAppointments() {
 
   useEffect(() => {
     loadAppointments()
+    // Auto-refresh every 3 seconds to sync appointments
+    const interval = setInterval(() => {
+      loadAppointments()
+    }, 3000)
+    
+    // Listen for all data change events to refresh immediately
+    const handleDataChange = () => {
+      loadAppointments()
+    }
+    
+    // Register listeners for all data change events
+    window.addEventListener('appointmentCreated', handleDataChange)
+    window.addEventListener('appointmentUpdated', handleDataChange)
+    window.addEventListener('appointmentDeleted', handleDataChange)
+    window.addEventListener('paymentRecorded', handleDataChange)
+    window.addEventListener('paymentDeleted', handleDataChange)
+    window.addEventListener('patientCreated', handleDataChange)
+    window.addEventListener('patientUpdated', handleDataChange)
+    window.addEventListener('patientDeleted', handleDataChange)
+    window.addEventListener('treatmentCreated', handleDataChange)
+    window.addEventListener('treatmentUpdated', handleDataChange)
+    window.addEventListener('dataChanged', handleDataChange) // Generic catch-all
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('appointmentCreated', handleDataChange)
+      window.removeEventListener('appointmentUpdated', handleDataChange)
+      window.removeEventListener('appointmentDeleted', handleDataChange)
+      window.removeEventListener('paymentRecorded', handleDataChange)
+      window.removeEventListener('paymentDeleted', handleDataChange)
+      window.removeEventListener('patientCreated', handleDataChange)
+      window.removeEventListener('patientUpdated', handleDataChange)
+      window.removeEventListener('patientDeleted', handleDataChange)
+      window.removeEventListener('treatmentCreated', handleDataChange)
+      window.removeEventListener('treatmentUpdated', handleDataChange)
+      window.removeEventListener('dataChanged', handleDataChange)
+    }
   }, [])
 
   const loadAppointments = async () => {
@@ -84,10 +121,34 @@ export default function HRAppointments() {
 
   const handleScheduleAppointment = async (data: any) => {
     try {
+      // #region agent log
+      const today = new Date().toISOString().split("T")[0]
+      fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/hr/appointments/page.tsx:87',message:'Creating appointment - before API call',data:{submittedDate:data.date,today,patientName:data.patient_name},timestamp:Date.now(),sessionId:'debug-session',runId:'appointment-date-fix',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
       console.log("[v0] HR creating appointment with data:", data)
       const newAppointment = await appointmentService.create(data)
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/hr/appointments/page.tsx:90',message:'Appointment created - after API call',data:{submittedDate:data.date,savedDate:newAppointment?.date,today,patientName:data.patient_name},timestamp:Date.now(),sessionId:'debug-session',runId:'appointment-date-fix',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
       console.log("[v0] ✅ Appointment created successfully:", newAppointment)
-      setAppointments([newAppointment, ...appointments])
+      
+      // Reload appointments to get fresh data from database
+      await loadAppointments()
+      
+      // Dispatch events to notify other pages (especially dashboard)
+      if (typeof window !== 'undefined') {
+        console.log("[v0] Appointments: Dispatching appointmentCreated and dataChanged events")
+        // Dispatch immediately and also after a short delay to ensure database write is complete
+        window.dispatchEvent(new CustomEvent('appointmentCreated'))
+        window.dispatchEvent(new CustomEvent('dataChanged'))
+        // Also trigger storage event for cross-tab sync
+        localStorage.setItem('dataChanged', Date.now().toString())
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('appointmentCreated'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }, 200)
+      }
+      
       setShowScheduleModal(false)
       
       // Show success modal instead of alert
@@ -115,6 +176,12 @@ export default function HRAppointments() {
         status: "pending",
       })
       setAppointments(appointments.map((a) => (a.id === selectedAppointment.id ? updated : a)))
+      
+      // Dispatch events to notify other pages
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('appointmentUpdated'))
+        window.dispatchEvent(new CustomEvent('dataChanged'))
+      }
       // Record the assignment in treatment_records so the dentist has a persisted assignment entry
       try {
         await treatmentRecordService.create({
@@ -142,6 +209,12 @@ export default function HRAppointments() {
       try {
         await appointmentService.delete(id)
         setAppointments(appointments.filter((a) => a.id !== id))
+        
+        // Dispatch events to notify other pages
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('appointmentDeleted'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }
       } catch (error) {
         console.error("[v0] Error deleting appointment:", error)
       }
@@ -152,6 +225,12 @@ export default function HRAppointments() {
     try {
       const updated = await appointmentService.changeStatus(id, newStatus)
       setAppointments(appointments.map((a) => (a.id === id ? updated : a)))
+      
+      // Dispatch events to notify other pages
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('appointmentUpdated'))
+        window.dispatchEvent(new CustomEvent('dataChanged'))
+      }
     } catch (error) {
       console.error("[v0] Error updating appointment status:", error)
     }
@@ -186,6 +265,13 @@ export default function HRAppointments() {
       // Reload appointments to reflect the change
       await loadAppointments()
       
+      // Dispatch events to notify other pages
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('paymentRecorded'))
+        window.dispatchEvent(new CustomEvent('appointmentUpdated'))
+        window.dispatchEvent(new CustomEvent('dataChanged'))
+      }
+      
       // Return payment ID for receipt generation
       return payment.id
     } catch (error) {
@@ -198,6 +284,13 @@ export default function HRAppointments() {
     try {
       await appointmentService.update(appointmentId, { status: "attended" })
       await loadAppointments()
+      
+      // Dispatch events to notify other pages
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('appointmentUpdated'))
+        window.dispatchEvent(new CustomEvent('dataChanged'))
+      }
+      
       console.log("[v0] ✅ Appointment marked as attended")
     } catch (error) {
       console.error("[v0] Error marking as attended:", error)
@@ -342,18 +435,22 @@ export default function HRAppointments() {
                 <CheckCircle className="w-5 h-5 text-purple-600" />
                 Confirmed Appointments - Patient Check-In ({statusGroups.confirmed.length})
               </CardTitle>
-              <p className="text-sm text-purple-700">Mark patients as attended when they arrive</p>
+              <p className="text-sm text-purple-700">Mark patients as attended when they arrive. Click to record payment.</p>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {statusGroups.confirmed.map((apt) => (
-                  <div
+                  <button
                     key={apt.id}
-                    className="p-5 border-2 border-purple-300 bg-white rounded-lg"
+                    onClick={() => {
+                      setSelectedAppointment(apt)
+                      setShowPaymentModal(true)
+                    }}
+                    className="p-5 border-2 border-purple-300 bg-white rounded-lg hover:bg-purple-50 hover:border-purple-500 transition-all text-left group"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <p className="font-bold text-lg text-foreground">
+                        <p className="font-bold text-lg text-foreground group-hover:text-primary">
                           {apt.patients?.name || "Unknown Patient"}
                         </p>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -366,19 +463,15 @@ export default function HRAppointments() {
                         <p className="text-sm text-muted-foreground">{apt.time}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 pt-3 border-t border-purple-200">
-                      <span className="text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-1 rounded flex-1">
+                    <div className="flex items-center justify-between pt-3 border-t border-purple-200">
+                      <span className="text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-1 rounded">
                         ✓ CONFIRMED
                       </span>
-                      <Button
-                        onClick={() => handleMarkAttended(apt.id)}
-                        size="sm"
-                        className="bg-purple-600 hover:bg-purple-700 text-white"
-                      >
-                        Mark Attended
-                      </Button>
+                      <span className="text-sm font-bold text-primary group-hover:underline">
+                        Record Payment →
+                      </span>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </CardContent>
@@ -434,6 +527,17 @@ export default function HRAppointments() {
                           <Button
                             size="sm"
                             variant="outline"
+                            onClick={() => {
+                              setSelectedAppointment(apt)
+                              setShowPaymentModal(true)
+                            }}
+                            className="text-primary border-primary hover:bg-primary/10"
+                          >
+                            Record Payment
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
                             onClick={() => handleDeleteAppointment(apt.id)}
                           >
                             <Trash2 className="w-3 h-3" />
@@ -444,6 +548,17 @@ export default function HRAppointments() {
                           <p className="flex-1 text-sm text-muted-foreground pt-2">
                             Dentist assigned, awaiting approval
                           </p>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedAppointment(apt)
+                              setShowPaymentModal(true)
+                            }}
+                            className="text-xs text-primary border-primary hover:bg-primary/10"
+                          >
+                            Record Payment
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
@@ -505,6 +620,10 @@ export default function HRAppointments() {
                             appointment={apt}
                             onStatusChange={handleStatusChange}
                             onDelete={handleDeleteAppointment}
+                            onRecordPayment={(apt: any) => {
+                              setSelectedAppointment(apt)
+                              setShowPaymentModal(true)
+                            }}
                           />
                         ))}
                       </div>
@@ -528,6 +647,10 @@ export default function HRAppointments() {
                             appointment={apt}
                             onStatusChange={handleStatusChange}
                             onDelete={handleDeleteAppointment}
+                            onRecordPayment={(apt: any) => {
+                              setSelectedAppointment(apt)
+                              setShowPaymentModal(true)
+                            }}
                           />
                         ))}
                       </div>
@@ -551,6 +674,10 @@ export default function HRAppointments() {
                             appointment={apt}
                             onStatusChange={handleStatusChange}
                             onDelete={handleDeleteAppointment}
+                            onRecordPayment={(apt: any) => {
+                              setSelectedAppointment(apt)
+                              setShowPaymentModal(true)
+                            }}
                           />
                         ))}
                       </div>
@@ -568,6 +695,10 @@ export default function HRAppointments() {
                         appointment={apt}
                         onStatusChange={handleStatusChange}
                         onDelete={handleDeleteAppointment}
+                        onRecordPayment={(apt: any) => {
+                          setSelectedAppointment(apt)
+                          setShowPaymentModal(true)
+                        }}
                       />
                     ))}
                   </div>
@@ -614,7 +745,7 @@ export default function HRAppointments() {
   )
 }
 
-function AppointmentCard({ appointment, onStatusChange, onDelete }: any) {
+function AppointmentCard({ appointment, onStatusChange, onDelete, onRecordPayment }: any) {
   return (
     <div className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
       <div className="flex items-start justify-between mb-3">
@@ -641,6 +772,16 @@ function AppointmentCard({ appointment, onStatusChange, onDelete }: any) {
           {appointment.date} at {appointment.time}
         </div>
         <div className="flex gap-2">
+          {onRecordPayment && appointment.status !== "paid" && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onRecordPayment(appointment)}
+              className="text-primary border-primary hover:bg-primary/10"
+            >
+              Record Payment
+            </Button>
+          )}
           {appointment.status === "pending" && (
             <>
               <Button

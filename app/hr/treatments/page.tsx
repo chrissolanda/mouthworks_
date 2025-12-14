@@ -43,6 +43,29 @@ export default function HRTreatments() {
 
   useEffect(() => {
     loadTreatments()
+    // Auto-refresh every 3 seconds to sync treatments
+    const interval = setInterval(() => {
+      loadTreatments()
+    }, 3000)
+    
+    // Listen for all data change events to refresh immediately
+    const handleDataChange = () => {
+      loadTreatments()
+    }
+    
+    // Register listeners for all data change events
+    window.addEventListener('treatmentCreated', handleDataChange)
+    window.addEventListener('treatmentUpdated', handleDataChange)
+    window.addEventListener('treatmentDeleted', handleDataChange)
+    window.addEventListener('dataChanged', handleDataChange) // Generic catch-all
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('treatmentCreated', handleDataChange)
+      window.removeEventListener('treatmentUpdated', handleDataChange)
+      window.removeEventListener('treatmentDeleted', handleDataChange)
+      window.removeEventListener('dataChanged', handleDataChange)
+    }
   }, [])
 
   const loadTreatments = async () => {
@@ -78,6 +101,12 @@ export default function HRTreatments() {
         setTreatments(treatments.map((t) => (t.id === editingTreatment.id ? updated : t)))
         setEditingTreatment(null)
         console.log("[v0] ✅ Treatment updated successfully")
+        
+        // Dispatch events to notify other pages
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('treatmentUpdated'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }
       } else {
         console.log("[v0] ➕ Creating new treatment")
         const newTreatment = await treatmentService.create(data)
@@ -88,6 +117,12 @@ export default function HRTreatments() {
         
         setTreatments([newTreatment, ...treatments])
         console.log("[v0] ✅ Treatment created successfully with ID:", newTreatment.id)
+        
+        // Dispatch events to notify other pages
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('treatmentCreated'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }
       }
       
       setShowAddModal(false)
@@ -109,6 +144,12 @@ export default function HRTreatments() {
       try {
         await treatmentService.delete(id)
         setTreatments(treatments.filter((t) => t.id !== id))
+        
+        // Dispatch events to notify other pages
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('treatmentDeleted'))
+          window.dispatchEvent(new CustomEvent('dataChanged'))
+        }
       } catch (error) {
         console.error("[v0] Error deleting treatment:", error)
       }

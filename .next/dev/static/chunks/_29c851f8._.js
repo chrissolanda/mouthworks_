@@ -713,6 +713,28 @@ const appointmentService = {
     },
     async create (appointment) {
         try {
+            // #region agent log
+            const today = new Date().toISOString().split("T")[0];
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:224',
+                    message: 'DB service - before insert',
+                    data: {
+                        appointmentDate: appointment.date,
+                        today,
+                        patientId: appointment.patient_id
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] 💾 Creating appointment in database:", appointment);
             const { data, error } = await getSupabase().from("appointments").insert([
                 appointment
@@ -721,6 +743,28 @@ const appointmentService = {
                 console.error("[v0] ❌ Supabase error creating appointment:", error);
                 throw new Error(`Failed to create appointment: ${error.message}`);
             }
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:235',
+                    message: 'DB service - after insert',
+                    data: {
+                        submittedDate: appointment.date,
+                        savedDate: data?.date,
+                        today,
+                        patientName: data?.patients?.name
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] ✅ Appointment saved to database:", data);
             return data;
         } catch (err) {
@@ -1273,12 +1317,17 @@ var _s = __turbopack_context__.k.signature();
 ;
 function ScheduleAppointmentModal({ onClose, onSubmit }) {
     _s();
+    // Set default date to today in YYYY-MM-DD format (for date input)
+    const getTodayDate = ()=>{
+        const today = new Date();
+        return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    };
     const [formData, setFormData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
         patient_id: "",
         patient_name: "",
         dentist_id: null,
         dentist_name: "",
-        date: "",
+        date: getTodayDate(),
         time: "",
         service: "",
         amount: 0,
@@ -1400,6 +1449,29 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                 notes: formData.notes,
                 status: "pending"
             };
+            // #region agent log
+            const today = new Date().toISOString().split("T")[0];
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'components/modals/schedule-appointment-modal.tsx:155',
+                    message: 'Submitting appointment - date check',
+                    data: {
+                        submittedDate: formData.date,
+                        today,
+                        patientName: formData.patient_name,
+                        service: formData.service
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] Submitting appointment for service:", formData.service, "(price: ₱" + formData.amount + " will be charged when completed)");
             onSubmit(submitData);
         } else {
@@ -1429,7 +1501,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                             children: "Schedule Appointment"
                         }, void 0, false, {
                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                            lineNumber: 169,
+                            lineNumber: 179,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1439,18 +1511,18 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                 className: "w-5 h-5"
                             }, void 0, false, {
                                 fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                lineNumber: 171,
+                                lineNumber: 181,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                            lineNumber: 170,
+                            lineNumber: 180,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                    lineNumber: 168,
+                    lineNumber: 178,
                     columnNumber: 9
                 }, this),
                 error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1458,7 +1530,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                     children: error
                 }, void 0, false, {
                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                    lineNumber: 177,
+                    lineNumber: 187,
                     columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1473,7 +1545,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Patient *"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 185,
+                                    lineNumber: 195,
                                     columnNumber: 13
                                 }, this),
                                 loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1481,7 +1553,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Loading patients..."
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 187,
+                                    lineNumber: 197,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                     name: "patient_id",
@@ -1495,7 +1567,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                             children: "Select patient..."
                                         }, void 0, false, {
                                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                            lineNumber: 196,
+                                            lineNumber: 206,
                                             columnNumber: 17
                                         }, this),
                                         patients.map((p)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1503,19 +1575,19 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                                 children: p.name
                                             }, p.id, false, {
                                                 fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                                lineNumber: 198,
+                                                lineNumber: 208,
                                                 columnNumber: 19
                                             }, this))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 189,
+                                    lineNumber: 199,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                            lineNumber: 184,
+                            lineNumber: 194,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1530,13 +1602,13 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                             children: "*"
                                         }, void 0, false, {
                                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                            lineNumber: 207,
+                                            lineNumber: 217,
                                             columnNumber: 76
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 207,
+                                    lineNumber: 217,
                                     columnNumber: 13
                                 }, this),
                                 loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1544,14 +1616,14 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Loading dentists..."
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 209,
+                                    lineNumber: 219,
                                     columnNumber: 15
                                 }, this) : dentists.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "text-sm text-muted-foreground",
                                     children: "No dentists available. Please add dentists first."
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 211,
+                                    lineNumber: 221,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                     name: "dentist_id",
@@ -1565,7 +1637,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                             children: "Select dentist..."
                                         }, void 0, false, {
                                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                            lineNumber: 220,
+                                            lineNumber: 230,
                                             columnNumber: 17
                                         }, this),
                                         dentists.map((d)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1573,13 +1645,13 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                                 children: d.name
                                             }, d.id, false, {
                                                 fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                                lineNumber: 222,
+                                                lineNumber: 232,
                                                 columnNumber: 19
                                             }, this))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 213,
+                                    lineNumber: 223,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1587,13 +1659,13 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "The selected dentist will be notified to approve this appointment"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 228,
+                                    lineNumber: 238,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                            lineNumber: 206,
+                            lineNumber: 216,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1604,7 +1676,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Service"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 232,
+                                    lineNumber: 242,
                                     columnNumber: 13
                                 }, this),
                                 loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1612,14 +1684,14 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Loading services..."
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 234,
+                                    lineNumber: 244,
                                     columnNumber: 15
                                 }, this) : treatments.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "text-sm text-muted-foreground",
                                     children: "No services available"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 236,
+                                    lineNumber: 246,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                     name: "service",
@@ -1633,7 +1705,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                             children: "Select service..."
                                         }, void 0, false, {
                                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                            lineNumber: 245,
+                                            lineNumber: 255,
                                             columnNumber: 17
                                         }, this),
                                         treatments.map((t)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1645,19 +1717,19 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                                 ]
                                             }, t.id, true, {
                                                 fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                                lineNumber: 247,
+                                                lineNumber: 257,
                                                 columnNumber: 19
                                             }, this))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 238,
+                                    lineNumber: 248,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                            lineNumber: 231,
+                            lineNumber: 241,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1668,7 +1740,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Date *"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 256,
+                                    lineNumber: 266,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1680,13 +1752,13 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     required: true
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 257,
+                                    lineNumber: 267,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                            lineNumber: 255,
+                            lineNumber: 265,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1697,7 +1769,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Time *"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 268,
+                                    lineNumber: 278,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -1712,7 +1784,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                             children: "Select time..."
                                         }, void 0, false, {
                                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                            lineNumber: 276,
+                                            lineNumber: 286,
                                             columnNumber: 15
                                         }, this),
                                         timeSlots.map((time)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1720,19 +1792,19 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                                 children: time
                                             }, time, false, {
                                                 fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                                lineNumber: 278,
+                                                lineNumber: 288,
                                                 columnNumber: 17
                                             }, this))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 269,
+                                    lineNumber: 279,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                            lineNumber: 267,
+                            lineNumber: 277,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1743,7 +1815,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Notes (Optional)"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 286,
+                                    lineNumber: 296,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -1755,13 +1827,13 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     rows: 3
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 287,
+                                    lineNumber: 297,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                            lineNumber: 285,
+                            lineNumber: 295,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1775,7 +1847,7 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 298,
+                                    lineNumber: 308,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1785,34 +1857,34 @@ function ScheduleAppointmentModal({ onClose, onSubmit }) {
                                     children: "Schedule"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                                    lineNumber: 301,
+                                    lineNumber: 311,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                            lineNumber: 297,
+                            lineNumber: 307,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-                    lineNumber: 183,
+                    lineNumber: 193,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-            lineNumber: 166,
+            lineNumber: 176,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/modals/schedule-appointment-modal.tsx",
-        lineNumber: 165,
+        lineNumber: 175,
         columnNumber: 5
     }, this);
 }
-_s(ScheduleAppointmentModal, "rLvvbyKmkBUuQxOgvlbN1QyDz3s=");
+_s(ScheduleAppointmentModal, "lgh8IijA+Uc2vej7QBXJD288eto=");
 _c = ScheduleAppointmentModal;
 var _c;
 __turbopack_context__.k.register(_c, "ScheduleAppointmentModal");
@@ -3689,6 +3761,46 @@ function HRAppointments() {
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "HRAppointments.useEffect": ()=>{
             loadAppointments();
+            // Auto-refresh every 3 seconds to sync appointments
+            const interval = setInterval({
+                "HRAppointments.useEffect.interval": ()=>{
+                    loadAppointments();
+                }
+            }["HRAppointments.useEffect.interval"], 3000);
+            // Listen for all data change events to refresh immediately
+            const handleDataChange = {
+                "HRAppointments.useEffect.handleDataChange": ()=>{
+                    loadAppointments();
+                }
+            }["HRAppointments.useEffect.handleDataChange"];
+            // Register listeners for all data change events
+            window.addEventListener('appointmentCreated', handleDataChange);
+            window.addEventListener('appointmentUpdated', handleDataChange);
+            window.addEventListener('appointmentDeleted', handleDataChange);
+            window.addEventListener('paymentRecorded', handleDataChange);
+            window.addEventListener('paymentDeleted', handleDataChange);
+            window.addEventListener('patientCreated', handleDataChange);
+            window.addEventListener('patientUpdated', handleDataChange);
+            window.addEventListener('patientDeleted', handleDataChange);
+            window.addEventListener('treatmentCreated', handleDataChange);
+            window.addEventListener('treatmentUpdated', handleDataChange);
+            window.addEventListener('dataChanged', handleDataChange); // Generic catch-all
+            return ({
+                "HRAppointments.useEffect": ()=>{
+                    clearInterval(interval);
+                    window.removeEventListener('appointmentCreated', handleDataChange);
+                    window.removeEventListener('appointmentUpdated', handleDataChange);
+                    window.removeEventListener('appointmentDeleted', handleDataChange);
+                    window.removeEventListener('paymentRecorded', handleDataChange);
+                    window.removeEventListener('paymentDeleted', handleDataChange);
+                    window.removeEventListener('patientCreated', handleDataChange);
+                    window.removeEventListener('patientUpdated', handleDataChange);
+                    window.removeEventListener('patientDeleted', handleDataChange);
+                    window.removeEventListener('treatmentCreated', handleDataChange);
+                    window.removeEventListener('treatmentUpdated', handleDataChange);
+                    window.removeEventListener('dataChanged', handleDataChange);
+                }
+            })["HRAppointments.useEffect"];
         }
     }["HRAppointments.useEffect"], []);
     const loadAppointments = async ()=>{
@@ -3709,7 +3821,7 @@ function HRAppointments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 75,
+                lineNumber: 112,
                 columnNumber: 33
             }, this),
             href: "/hr/dashboard"
@@ -3720,7 +3832,7 @@ function HRAppointments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 76,
+                lineNumber: 113,
                 columnNumber: 32
             }, this),
             href: "/hr/patients"
@@ -3731,7 +3843,7 @@ function HRAppointments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 77,
+                lineNumber: 114,
                 columnNumber: 36
             }, this),
             href: "/hr/appointments"
@@ -3742,7 +3854,7 @@ function HRAppointments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 78,
+                lineNumber: 115,
                 columnNumber: 34
             }, this),
             href: "/hr/treatments"
@@ -3753,7 +3865,7 @@ function HRAppointments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 79,
+                lineNumber: 116,
                 columnNumber: 32
             }, this),
             href: "/hr/payments"
@@ -3764,7 +3876,7 @@ function HRAppointments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 80,
+                lineNumber: 117,
                 columnNumber: 33
             }, this),
             href: "/hr/inventory"
@@ -3775,7 +3887,7 @@ function HRAppointments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 81,
+                lineNumber: 118,
                 columnNumber: 31
             }, this),
             href: "/hr/reports"
@@ -3786,7 +3898,7 @@ function HRAppointments() {
                 className: "w-5 h-5"
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 82,
+                lineNumber: 119,
                 columnNumber: 32
             }, this),
             href: "/hr/settings"
@@ -3794,13 +3906,68 @@ function HRAppointments() {
     ];
     const handleScheduleAppointment = async (data)=>{
         try {
+            // #region agent log
+            const today = new Date().toISOString().split("T")[0];
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'app/hr/appointments/page.tsx:87',
+                    message: 'Creating appointment - before API call',
+                    data: {
+                        submittedDate: data.date,
+                        today,
+                        patientName: data.patient_name
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] HR creating appointment with data:", data);
             const newAppointment = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["appointmentService"].create(data);
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'app/hr/appointments/page.tsx:90',
+                    message: 'Appointment created - after API call',
+                    data: {
+                        submittedDate: data.date,
+                        savedDate: newAppointment?.date,
+                        today,
+                        patientName: data.patient_name
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] ✅ Appointment created successfully:", newAppointment);
-            setAppointments([
-                newAppointment,
-                ...appointments
-            ]);
+            // Reload appointments to get fresh data from database
+            await loadAppointments();
+            // Dispatch events to notify other pages (especially dashboard)
+            if ("TURBOPACK compile-time truthy", 1) {
+                console.log("[v0] Appointments: Dispatching appointmentCreated and dataChanged events");
+                // Dispatch immediately and also after a short delay to ensure database write is complete
+                window.dispatchEvent(new CustomEvent('appointmentCreated'));
+                window.dispatchEvent(new CustomEvent('dataChanged'));
+                // Also trigger storage event for cross-tab sync
+                localStorage.setItem('dataChanged', Date.now().toString());
+                setTimeout(()=>{
+                    window.dispatchEvent(new CustomEvent('appointmentCreated'));
+                    window.dispatchEvent(new CustomEvent('dataChanged'));
+                }, 200);
+            }
             setShowScheduleModal(false);
             // Show success modal instead of alert
             setSuccessAppointment({
@@ -3826,6 +3993,11 @@ function HRAppointments() {
                 status: "pending"
             });
             setAppointments(appointments.map((a)=>a.id === selectedAppointment.id ? updated : a));
+            // Dispatch events to notify other pages
+            if ("TURBOPACK compile-time truthy", 1) {
+                window.dispatchEvent(new CustomEvent('appointmentUpdated'));
+                window.dispatchEvent(new CustomEvent('dataChanged'));
+            }
             // Record the assignment in treatment_records so the dentist has a persisted assignment entry
             try {
                 await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["treatmentRecordService"].create({
@@ -3852,6 +4024,11 @@ function HRAppointments() {
             try {
                 await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["appointmentService"].delete(id);
                 setAppointments(appointments.filter((a)=>a.id !== id));
+                // Dispatch events to notify other pages
+                if ("TURBOPACK compile-time truthy", 1) {
+                    window.dispatchEvent(new CustomEvent('appointmentDeleted'));
+                    window.dispatchEvent(new CustomEvent('dataChanged'));
+                }
             } catch (error) {
                 console.error("[v0] Error deleting appointment:", error);
             }
@@ -3861,6 +4038,11 @@ function HRAppointments() {
         try {
             const updated = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["appointmentService"].changeStatus(id, newStatus);
             setAppointments(appointments.map((a)=>a.id === id ? updated : a));
+            // Dispatch events to notify other pages
+            if ("TURBOPACK compile-time truthy", 1) {
+                window.dispatchEvent(new CustomEvent('appointmentUpdated'));
+                window.dispatchEvent(new CustomEvent('dataChanged'));
+            }
         } catch (error) {
             console.error("[v0] Error updating appointment status:", error);
         }
@@ -3889,6 +4071,12 @@ function HRAppointments() {
             });
             // Reload appointments to reflect the change
             await loadAppointments();
+            // Dispatch events to notify other pages
+            if ("TURBOPACK compile-time truthy", 1) {
+                window.dispatchEvent(new CustomEvent('paymentRecorded'));
+                window.dispatchEvent(new CustomEvent('appointmentUpdated'));
+                window.dispatchEvent(new CustomEvent('dataChanged'));
+            }
             // Return payment ID for receipt generation
             return payment.id;
         } catch (error) {
@@ -3902,6 +4090,11 @@ function HRAppointments() {
                 status: "attended"
             });
             await loadAppointments();
+            // Dispatch events to notify other pages
+            if ("TURBOPACK compile-time truthy", 1) {
+                window.dispatchEvent(new CustomEvent('appointmentUpdated'));
+                window.dispatchEvent(new CustomEvent('dataChanged'));
+            }
             console.log("[v0] ✅ Appointment marked as attended");
         } catch (error) {
             console.error("[v0] Error marking as attended:", error);
@@ -3934,7 +4127,7 @@ function HRAppointments() {
                                         children: "Schedule Appointments"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 225,
+                                        lineNumber: 318,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3942,13 +4135,13 @@ function HRAppointments() {
                                         children: "Manage patient bookings and dentist assignments"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 226,
+                                        lineNumber: 319,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 224,
+                                lineNumber: 317,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -3959,20 +4152,20 @@ function HRAppointments() {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 232,
+                                        lineNumber: 325,
                                         columnNumber: 13
                                     }, this),
                                     "New Appointment"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 228,
+                                lineNumber: 321,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 223,
+                        lineNumber: 316,
                         columnNumber: 9
                     }, this),
                     statusGroups.completed.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -3987,7 +4180,7 @@ function HRAppointments() {
                                                 className: "w-5 h-5 text-green-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 242,
+                                                lineNumber: 335,
                                                 columnNumber: 17
                                             }, this),
                                             "Completed Appointments - Ready for Payment (",
@@ -3996,7 +4189,7 @@ function HRAppointments() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 241,
+                                        lineNumber: 334,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4004,13 +4197,13 @@ function HRAppointments() {
                                         children: "Click on any appointment to record payment"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 245,
+                                        lineNumber: 338,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 240,
+                                lineNumber: 333,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -4034,7 +4227,7 @@ function HRAppointments() {
                                                                     children: apt.patients?.name || "Unknown Patient"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 260,
+                                                                    lineNumber: 353,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4045,20 +4238,20 @@ function HRAppointments() {
                                                                             children: apt.service || "General Visit"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                            lineNumber: 264,
+                                                                            lineNumber: 357,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         apt.dentists?.name && ` • Dr. ${apt.dentists.name}`
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 263,
+                                                                    lineNumber: 356,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 259,
+                                                            lineNumber: 352,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4069,7 +4262,7 @@ function HRAppointments() {
                                                                     children: apt.date
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 269,
+                                                                    lineNumber: 362,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4077,19 +4270,19 @@ function HRAppointments() {
                                                                     children: apt.time
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 270,
+                                                                    lineNumber: 363,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 268,
+                                                            lineNumber: 361,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                    lineNumber: 258,
+                                                    lineNumber: 351,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4100,7 +4293,7 @@ function HRAppointments() {
                                                             children: "✓ COMPLETED"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 274,
+                                                            lineNumber: 367,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4108,35 +4301,35 @@ function HRAppointments() {
                                                             children: "Record Payment →"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 277,
+                                                            lineNumber: 370,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                    lineNumber: 273,
+                                                    lineNumber: 366,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, apt.id, true, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 250,
+                                            lineNumber: 343,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 248,
+                                    lineNumber: 341,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 247,
+                                lineNumber: 340,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 239,
+                        lineNumber: 332,
                         columnNumber: 11
                     }, this),
                     statusGroups.paid.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -4151,7 +4344,7 @@ function HRAppointments() {
                                                 className: "w-5 h-5 text-blue-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 293,
+                                                lineNumber: 386,
                                                 columnNumber: 17
                                             }, this),
                                             "Paid Appointments (",
@@ -4160,7 +4353,7 @@ function HRAppointments() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 292,
+                                        lineNumber: 385,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4168,13 +4361,13 @@ function HRAppointments() {
                                         children: "Appointments with recorded payments"
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 296,
+                                        lineNumber: 389,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 291,
+                                lineNumber: 384,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -4194,7 +4387,7 @@ function HRAppointments() {
                                                                     children: apt.patients?.name || "Unknown Patient"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 307,
+                                                                    lineNumber: 400,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4205,20 +4398,20 @@ function HRAppointments() {
                                                                             children: apt.service || "General Visit"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                            lineNumber: 311,
+                                                                            lineNumber: 404,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         apt.dentists?.name && ` • Dr. ${apt.dentists.name}`
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 310,
+                                                                    lineNumber: 403,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 306,
+                                                            lineNumber: 399,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4229,7 +4422,7 @@ function HRAppointments() {
                                                                     children: apt.date
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 316,
+                                                                    lineNumber: 409,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4237,19 +4430,19 @@ function HRAppointments() {
                                                                     children: apt.time
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 317,
+                                                                    lineNumber: 410,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 315,
+                                                            lineNumber: 408,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                    lineNumber: 305,
+                                                    lineNumber: 398,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4260,7 +4453,7 @@ function HRAppointments() {
                                                             children: "✓ PAID"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 321,
+                                                            lineNumber: 414,
                                                             columnNumber: 23
                                                         }, this),
                                                         apt.amount && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4268,35 +4461,35 @@ function HRAppointments() {
                                                             children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatCurrency"])(apt.amount)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 325,
+                                                            lineNumber: 418,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                    lineNumber: 320,
+                                                    lineNumber: 413,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, apt.id, true, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 301,
+                                            lineNumber: 394,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 299,
+                                    lineNumber: 392,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 298,
+                                lineNumber: 391,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 290,
+                        lineNumber: 383,
                         columnNumber: 11
                     }, this),
                     statusGroups.confirmed.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -4311,7 +4504,7 @@ function HRAppointments() {
                                                 className: "w-5 h-5 text-purple-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 342,
+                                                lineNumber: 435,
                                                 columnNumber: 17
                                             }, this),
                                             "Confirmed Appointments - Patient Check-In (",
@@ -4320,28 +4513,32 @@ function HRAppointments() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 341,
+                                        lineNumber: 434,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         className: "text-sm text-purple-700",
-                                        children: "Mark patients as attended when they arrive"
+                                        children: "Mark patients as attended when they arrive. Click to record payment."
                                     }, void 0, false, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 345,
+                                        lineNumber: 438,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 340,
+                                lineNumber: 433,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "grid grid-cols-1 md:grid-cols-2 gap-4",
-                                    children: statusGroups.confirmed.map((apt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "p-5 border-2 border-purple-300 bg-white rounded-lg",
+                                    children: statusGroups.confirmed.map((apt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            onClick: ()=>{
+                                                setSelectedAppointment(apt);
+                                                setShowPaymentModal(true);
+                                            },
+                                            className: "p-5 border-2 border-purple-300 bg-white rounded-lg hover:bg-purple-50 hover:border-purple-500 transition-all text-left group",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "flex items-start justify-between mb-3",
@@ -4350,11 +4547,11 @@ function HRAppointments() {
                                                             className: "flex-1",
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                    className: "font-bold text-lg text-foreground",
+                                                                    className: "font-bold text-lg text-foreground group-hover:text-primary",
                                                                     children: apt.patients?.name || "Unknown Patient"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 356,
+                                                                    lineNumber: 453,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4365,20 +4562,20 @@ function HRAppointments() {
                                                                             children: apt.service || "General Visit"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                            lineNumber: 360,
+                                                                            lineNumber: 457,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         apt.dentists?.name && ` • Dr. ${apt.dentists.name}`
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 359,
+                                                                    lineNumber: 456,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 355,
+                                                            lineNumber: 452,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4389,7 +4586,7 @@ function HRAppointments() {
                                                                     children: apt.date
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 365,
+                                                                    lineNumber: 462,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4397,68 +4594,66 @@ function HRAppointments() {
                                                                     children: apt.time
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 366,
+                                                                    lineNumber: 463,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 364,
+                                                            lineNumber: 461,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                    lineNumber: 354,
+                                                    lineNumber: 451,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "flex items-center gap-2 pt-3 border-t border-purple-200",
+                                                    className: "flex items-center justify-between pt-3 border-t border-purple-200",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-1 rounded flex-1",
+                                                            className: "text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-1 rounded",
                                                             children: "✓ CONFIRMED"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 370,
+                                                            lineNumber: 467,
                                                             columnNumber: 23
                                                         }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
-                                                            onClick: ()=>handleMarkAttended(apt.id),
-                                                            size: "sm",
-                                                            className: "bg-purple-600 hover:bg-purple-700 text-white",
-                                                            children: "Mark Attended"
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "text-sm font-bold text-primary group-hover:underline",
+                                                            children: "Record Payment →"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 373,
+                                                            lineNumber: 470,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                    lineNumber: 369,
+                                                    lineNumber: 466,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, apt.id, true, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 350,
+                                            lineNumber: 443,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 348,
+                                    lineNumber: 441,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 347,
+                                lineNumber: 440,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 339,
+                        lineNumber: 432,
                         columnNumber: 11
                     }, this),
                     statusGroups.pending.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -4472,7 +4667,7 @@ function HRAppointments() {
                                             className: "w-5 h-5 text-blue-600"
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 393,
+                                            lineNumber: 486,
                                             columnNumber: 17
                                         }, this),
                                         "Patient Booking Requests (",
@@ -4481,12 +4676,12 @@ function HRAppointments() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 392,
+                                    lineNumber: 485,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 391,
+                                lineNumber: 484,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -4506,7 +4701,7 @@ function HRAppointments() {
                                                                     children: apt.patients?.name || "Unknown Patient"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 406,
+                                                                    lineNumber: 499,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4517,13 +4712,13 @@ function HRAppointments() {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 409,
+                                                                    lineNumber: 502,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 405,
+                                                            lineNumber: 498,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4534,7 +4729,7 @@ function HRAppointments() {
                                                                     children: apt.date
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 415,
+                                                                    lineNumber: 508,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4542,19 +4737,19 @@ function HRAppointments() {
                                                                     children: apt.time
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 416,
+                                                                    lineNumber: 509,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 414,
+                                                            lineNumber: 507,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                    lineNumber: 404,
+                                                    lineNumber: 497,
                                                     columnNumber: 21
                                                 }, this),
                                                 apt.notes && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4565,7 +4760,7 @@ function HRAppointments() {
                                                             children: "Patient Notes:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                                            lineNumber: 421,
+                                                            lineNumber: 514,
                                                             columnNumber: 25
                                                         }, this),
                                                         " ",
@@ -4573,7 +4768,7 @@ function HRAppointments() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                    lineNumber: 420,
+                                                    lineNumber: 513,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4588,14 +4783,28 @@ function HRAppointments() {
                                                                         className: "w-4 h-4 mr-2"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                        lineNumber: 431,
+                                                                        lineNumber: 524,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     "Assign Dentist"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                lineNumber: 427,
+                                                                lineNumber: 520,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                                                size: "sm",
+                                                                variant: "outline",
+                                                                onClick: ()=>{
+                                                                    setSelectedAppointment(apt);
+                                                                    setShowPaymentModal(true);
+                                                                },
+                                                                className: "text-primary border-primary hover:bg-primary/10",
+                                                                children: "Record Payment"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/hr/appointments/page.tsx",
+                                                                lineNumber: 527,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -4606,12 +4815,12 @@ function HRAppointments() {
                                                                     className: "w-3 h-3"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                    lineNumber: 439,
+                                                                    lineNumber: 543,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                lineNumber: 434,
+                                                                lineNumber: 538,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
@@ -4622,7 +4831,21 @@ function HRAppointments() {
                                                                 children: "Dentist assigned, awaiting approval"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                lineNumber: 444,
+                                                                lineNumber: 548,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                                                size: "sm",
+                                                                variant: "outline",
+                                                                onClick: ()=>{
+                                                                    setSelectedAppointment(apt);
+                                                                    setShowPaymentModal(true);
+                                                                },
+                                                                className: "text-xs text-primary border-primary hover:bg-primary/10",
+                                                                children: "Record Payment"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/hr/appointments/page.tsx",
+                                                                lineNumber: 551,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -4633,36 +4856,36 @@ function HRAppointments() {
                                                                 children: "Change"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                                lineNumber: 447,
+                                                                lineNumber: 562,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                                    lineNumber: 424,
+                                                    lineNumber: 517,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, apt.id, true, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 400,
+                                            lineNumber: 493,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 398,
+                                    lineNumber: 491,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 397,
+                                lineNumber: 490,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 390,
+                        lineNumber: 483,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4682,12 +4905,12 @@ function HRAppointments() {
                                 ]
                             }, status, true, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 468,
+                                lineNumber: 583,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 466,
+                        lineNumber: 581,
                         columnNumber: 9
                     }, this),
                     loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -4698,17 +4921,17 @@ function HRAppointments() {
                                 children: "Loading appointments..."
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 485,
+                                lineNumber: 600,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/appointments/page.tsx",
-                            lineNumber: 484,
+                            lineNumber: 599,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 483,
+                        lineNumber: 598,
                         columnNumber: 11
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "space-y-4",
@@ -4724,7 +4947,7 @@ function HRAppointments() {
                                                         className: "w-5 h-5 text-yellow-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                                        lineNumber: 496,
+                                                        lineNumber: 611,
                                                         columnNumber: 25
                                                     }, this),
                                                     "Pending Approval (",
@@ -4733,12 +4956,12 @@ function HRAppointments() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 495,
+                                                lineNumber: 610,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 494,
+                                            lineNumber: 609,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -4747,26 +4970,30 @@ function HRAppointments() {
                                                 children: statusGroups.pending.map((apt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(AppointmentCard, {
                                                         appointment: apt,
                                                         onStatusChange: handleStatusChange,
-                                                        onDelete: handleDeleteAppointment
+                                                        onDelete: handleDeleteAppointment,
+                                                        onRecordPayment: (apt)=>{
+                                                            setSelectedAppointment(apt);
+                                                            setShowPaymentModal(true);
+                                                        }
                                                     }, apt.id, false, {
                                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                                        lineNumber: 503,
+                                                        lineNumber: 618,
                                                         columnNumber: 27
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 501,
+                                                lineNumber: 616,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 500,
+                                            lineNumber: 615,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 493,
+                                    lineNumber: 608,
                                     columnNumber: 19
                                 }, this),
                                 statusGroups.confirmed.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -4779,7 +5006,7 @@ function HRAppointments() {
                                                         className: "w-5 h-5 text-green-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                                        lineNumber: 519,
+                                                        lineNumber: 638,
                                                         columnNumber: 25
                                                     }, this),
                                                     "Confirmed (",
@@ -4788,12 +5015,12 @@ function HRAppointments() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 518,
+                                                lineNumber: 637,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 517,
+                                            lineNumber: 636,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -4802,26 +5029,30 @@ function HRAppointments() {
                                                 children: statusGroups.confirmed.map((apt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(AppointmentCard, {
                                                         appointment: apt,
                                                         onStatusChange: handleStatusChange,
-                                                        onDelete: handleDeleteAppointment
+                                                        onDelete: handleDeleteAppointment,
+                                                        onRecordPayment: (apt)=>{
+                                                            setSelectedAppointment(apt);
+                                                            setShowPaymentModal(true);
+                                                        }
                                                     }, apt.id, false, {
                                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                                        lineNumber: 526,
+                                                        lineNumber: 645,
                                                         columnNumber: 27
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 524,
+                                                lineNumber: 643,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 523,
+                                            lineNumber: 642,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 516,
+                                    lineNumber: 635,
                                     columnNumber: 19
                                 }, this),
                                 statusGroups.completed.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -4834,7 +5065,7 @@ function HRAppointments() {
                                                         className: "w-5 h-5 text-green-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                                        lineNumber: 542,
+                                                        lineNumber: 665,
                                                         columnNumber: 25
                                                     }, this),
                                                     "Completed (",
@@ -4843,12 +5074,12 @@ function HRAppointments() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 541,
+                                                lineNumber: 664,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 540,
+                                            lineNumber: 663,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -4857,26 +5088,30 @@ function HRAppointments() {
                                                 children: statusGroups.completed.map((apt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(AppointmentCard, {
                                                         appointment: apt,
                                                         onStatusChange: handleStatusChange,
-                                                        onDelete: handleDeleteAppointment
+                                                        onDelete: handleDeleteAppointment,
+                                                        onRecordPayment: (apt)=>{
+                                                            setSelectedAppointment(apt);
+                                                            setShowPaymentModal(true);
+                                                        }
                                                     }, apt.id, false, {
                                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                                        lineNumber: 549,
+                                                        lineNumber: 672,
                                                         columnNumber: 27
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 547,
+                                                lineNumber: 670,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 546,
+                                            lineNumber: 669,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 539,
+                                    lineNumber: 662,
                                     columnNumber: 19
                                 }, this)
                             ]
@@ -4888,36 +5123,40 @@ function HRAppointments() {
                                     children: filteredAppointments.map((apt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(AppointmentCard, {
                                             appointment: apt,
                                             onStatusChange: handleStatusChange,
-                                            onDelete: handleDeleteAppointment
+                                            onDelete: handleDeleteAppointment,
+                                            onRecordPayment: (apt)=>{
+                                                setSelectedAppointment(apt);
+                                                setShowPaymentModal(true);
+                                            }
                                         }, apt.id, false, {
                                             fileName: "[project]/app/hr/appointments/page.tsx",
-                                            lineNumber: 566,
+                                            lineNumber: 693,
                                             columnNumber: 23
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 564,
+                                    lineNumber: 691,
                                     columnNumber: 19
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 563,
+                                lineNumber: 690,
                                 columnNumber: 17
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/hr/appointments/page.tsx",
-                            lineNumber: 562,
+                            lineNumber: 689,
                             columnNumber: 15
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 489,
+                        lineNumber: 604,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 221,
+                lineNumber: 314,
                 columnNumber: 7
             }, this),
             showScheduleModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modals$2f$schedule$2d$appointment$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4925,7 +5164,7 @@ function HRAppointments() {
                 onSubmit: handleScheduleAppointment
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 582,
+                lineNumber: 713,
                 columnNumber: 9
             }, this),
             showSuccessModal && successAppointment && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modals$2f$appointment$2d$success$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4936,7 +5175,7 @@ function HRAppointments() {
                 }
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 586,
+                lineNumber: 717,
                 columnNumber: 9
             }, this),
             showAssignModal && selectedAppointment && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modals$2f$assign$2d$dentist$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4945,7 +5184,7 @@ function HRAppointments() {
                 onAssign: handleAssignDentist
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 596,
+                lineNumber: 727,
                 columnNumber: 9
             }, this),
             showPaymentModal && selectedAppointment && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modals$2f$appointment$2d$payment$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -4957,13 +5196,13 @@ function HRAppointments() {
                 onRecordPayment: handleRecordPayment
             }, void 0, false, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 604,
+                lineNumber: 735,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/hr/appointments/page.tsx",
-        lineNumber: 220,
+        lineNumber: 313,
         columnNumber: 5
     }, this);
 }
@@ -4973,7 +5212,7 @@ _s(HRAppointments, "+lc48l8WNBG/bY5D5qsvbTe9DaU=", false, function() {
     ];
 });
 _c = HRAppointments;
-function AppointmentCard({ appointment, onStatusChange, onDelete }) {
+function AppointmentCard({ appointment, onStatusChange, onDelete, onRecordPayment }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors",
         children: [
@@ -4988,7 +5227,7 @@ function AppointmentCard({ appointment, onStatusChange, onDelete }) {
                                 children: appointment.patients?.name || "Unknown Patient"
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 622,
+                                lineNumber: 753,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5000,13 +5239,13 @@ function AppointmentCard({ appointment, onStatusChange, onDelete }) {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 623,
+                                lineNumber: 754,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 621,
+                        lineNumber: 752,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5014,13 +5253,13 @@ function AppointmentCard({ appointment, onStatusChange, onDelete }) {
                         children: appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)
                     }, void 0, false, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 627,
+                        lineNumber: 758,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 620,
+                lineNumber: 751,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5035,12 +5274,23 @@ function AppointmentCard({ appointment, onStatusChange, onDelete }) {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 640,
+                        lineNumber: 771,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "flex gap-2",
                         children: [
+                            onRecordPayment && appointment.status !== "paid" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                size: "sm",
+                                variant: "outline",
+                                onClick: ()=>onRecordPayment(appointment),
+                                className: "text-primary border-primary hover:bg-primary/10",
+                                children: "Record Payment"
+                            }, void 0, false, {
+                                fileName: "[project]/app/hr/appointments/page.tsx",
+                                lineNumber: 776,
+                                columnNumber: 13
+                            }, this),
                             appointment.status === "pending" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -5052,14 +5302,14 @@ function AppointmentCard({ appointment, onStatusChange, onDelete }) {
                                                 className: "w-3 h-3 mr-1"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 651,
+                                                lineNumber: 792,
                                                 columnNumber: 17
                                             }, this),
                                             "Confirm"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 646,
+                                        lineNumber: 787,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -5072,14 +5322,14 @@ function AppointmentCard({ appointment, onStatusChange, onDelete }) {
                                                 className: "w-3 h-3 mr-1"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                                lineNumber: 660,
+                                                lineNumber: 801,
                                                 columnNumber: 17
                                             }, this),
                                             "Reject"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/hr/appointments/page.tsx",
-                                        lineNumber: 654,
+                                        lineNumber: 795,
                                         columnNumber: 15
                                     }, this)
                                 ]
@@ -5093,30 +5343,30 @@ function AppointmentCard({ appointment, onStatusChange, onDelete }) {
                                     className: "w-3 h-3"
                                 }, void 0, false, {
                                     fileName: "[project]/app/hr/appointments/page.tsx",
-                                    lineNumber: 671,
+                                    lineNumber: 812,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/hr/appointments/page.tsx",
-                                lineNumber: 665,
+                                lineNumber: 806,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/hr/appointments/page.tsx",
-                        lineNumber: 643,
+                        lineNumber: 774,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/hr/appointments/page.tsx",
-                lineNumber: 639,
+                lineNumber: 770,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/hr/appointments/page.tsx",
-        lineNumber: 619,
+        lineNumber: 750,
         columnNumber: 5
     }, this);
 }

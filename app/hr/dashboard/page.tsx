@@ -36,25 +36,72 @@ export default function HRDashboard() {
   const [todayAppointments, setTodayAppointments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [patients, appointments, payments, inventory] = await Promise.all([
-          patientService.getAll().catch(() => []),
-          appointmentService.getAll().catch(() => []),
-          paymentService.getAll().catch(() => []),
-          inventoryService.getAll().catch(() => []),
-        ])
+  const loadData = async () => {
+    try {
+      console.log("[v0] Dashboard: Loading all data at", new Date().toISOString())
+      const [patients, appointments, payments, inventory] = await Promise.all([
+        patientService.getAll().catch(() => []),
+        appointmentService.getAll().catch(() => []),
+        paymentService.getAll().catch(() => []),
+        inventoryService.getAll().catch(() => []),
+      ])
 
-        const today = new Date().toISOString().split("T")[0]
-        const todayAppts = (appointments || []).filter((a: any) => a.date === today)
+        // Get today's date in YYYY-MM-DD format - use local timezone to match user's date
+        const now = new Date()
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+        
+        // #region agent log
+        const sampleDates = (appointments || []).slice(0, 5).map((a: any) => ({id: a.id, date: a.date, dateType: typeof a.date, patient: a.patients?.name}))
+        fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/hr/dashboard/page.tsx:52',message:'Date filtering - sample dates',data:{today,appointmentsCount:appointments?.length || 0,sampleDates},timestamp:Date.now(),sessionId:'debug-session',runId:'dashboard-fix-v2',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
+        
+        // Filter appointments for today - handle various date formats from database
+        const todayAppts = (appointments || []).filter((a: any) => {
+          if (!a.date) return false
+          
+          // Normalize appointment date to YYYY-MM-DD format
+          let appointmentDate = ""
+          if (typeof a.date === 'string') {
+            // Handle "YYYY-MM-DD" or "YYYY-MM-DDTHH:mm:ss" or "YYYY-MM-DDTHH:mm:ssZ"
+            appointmentDate = a.date.split("T")[0].split(" ")[0]
+          } else if (a.date instanceof Date) {
+            appointmentDate = `${a.date.getFullYear()}-${String(a.date.getMonth() + 1).padStart(2, '0')}-${String(a.date.getDate()).padStart(2, '0')}`
+          } else {
+            // Try to parse as date
+            try {
+              const dateObj = new Date(a.date)
+              appointmentDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`
+            } catch {
+              return false
+            }
+          }
+          
+          const matches = appointmentDate === today
+          
+          // #region agent log
+          if (matches) {
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/hr/dashboard/page.tsx:75',message:'MATCH - Appointment for today',data:{appointmentId:a.id,appointmentDate,today,patientName:a.patients?.name,originalDate:a.date},timestamp:Date.now(),sessionId:'debug-session',runId:'dashboard-fix-v2',hypothesisId:'A'})}).catch(()=>{});
+          }
+          // #endregion
+          
+          return matches
+        })
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/hr/dashboard/page.tsx:85',message:'Today appointments result',data:{todayApptsCount:todayAppts.length,today,allAppointmentsCount:appointments?.length || 0},timestamp:Date.now(),sessionId:'debug-session',runId:'dashboard-fix-v2',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         const pendingPaymentsAmount = (payments || [])
           .filter((p: any) => p.status !== "paid")
           .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
         const lowStockCount = (inventory || []).filter((i: any) => i.status === "low" || i.status === "critical").length
         
         // Appointment status counts
-        const needAssignment = (appointments || []).filter((a: any) => a.status === "pending" && !a.dentist_id).length
+        // Only count pending appointments that need dentist assignment
+        // Explicitly exclude completed, paid, cancelled, and rejected statuses
+        const needAssignment = (appointments || []).filter((a: any) => {
+          const status = a.status?.toLowerCase() || ""
+          return status === "pending" && !a.dentist_id
+        }).length
         const confirmed = (appointments || []).filter((a: any) => a.status === "confirmed").length
         const readyForPayment = (appointments || []).filter((a: any) => a.status === "completed").length
         const inProgress = (appointments || []).filter((a: any) => a.status === "in-progress").length
@@ -70,6 +117,8 @@ export default function HRDashboard() {
           inProgress: inProgress || 0,
         })
         setTodayAppointments((todayAppts || []).slice(0, 4))
+        console.log("[v0] Dashboard: Data loaded successfully at", new Date().toISOString())
+        console.log("[v0] Dashboard: Stats - needAssignment:", needAssignment, "pendingPayments:", pendingPaymentsAmount, "todayAppts:", todayAppts.length, "total appointments:", appointments?.length)
       } catch (error) {
         console.error("[v0] Error loading dashboard:", error instanceof Error ? error.message : error)
         setStats({
@@ -88,7 +137,73 @@ export default function HRDashboard() {
       }
     }
 
+  useEffect(() => {
     loadData()
+    // Auto-refresh every 3 seconds to sync all data
+    const interval = setInterval(() => {
+      loadData()
+    }, 3000)
+    
+    // Listen for all data change events to refresh immediately
+    const handleDataChange = (event?: Event) => {
+      const eventName = event?.type || 'unknown'
+      console.log(`[v0] Dashboard: Data change event received (${eventName}), refreshing immediately...`)
+      // Force immediate refresh on any data change - no debounce, instant sync
+      loadData().catch(err => {
+        console.error("[v0] Dashboard: Error during sync refresh:", err)
+      })
+    }
+    
+    // Also listen to storage events (for cross-tab sync)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'dataChanged') {
+        console.log("[v0] Dashboard: Storage event detected, refreshing...")
+        loadData().catch(err => {
+          console.error("[v0] Dashboard: Error during storage sync refresh:", err)
+        })
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Register listeners for ALL possible data change events
+    const events = [
+      'appointmentCreated',
+      'appointmentUpdated', 
+      'appointmentDeleted',
+      'paymentRecorded',
+      'paymentDeleted',
+      'paymentUpdated',
+      'inventoryUpdated',
+      'inventoryCreated',
+      'inventoryDeleted',
+      'patientCreated',
+      'patientUpdated',
+      'patientDeleted',
+      'treatmentCreated',
+      'treatmentUpdated',
+      'treatmentDeleted',
+      'dentistCreated',
+      'dentistUpdated',
+      'dentistDeleted',
+      'staffCreated',
+      'staffUpdated',
+      'staffDeleted',
+      'dataChanged' // Generic catch-all - must be last
+    ]
+    
+    // Add all event listeners
+    events.forEach(event => {
+      window.addEventListener(event, handleDataChange)
+    })
+    
+    return () => {
+      clearInterval(interval)
+      // Remove all event listeners
+      events.forEach(event => {
+        window.removeEventListener(event, handleDataChange)
+      })
+      window.removeEventListener('storage', handleStorageChange)
+    }
   }, [])
 
   const navItems = [

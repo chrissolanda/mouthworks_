@@ -250,12 +250,11 @@ export default function DentistDashboard() {
 
 
 
+  const today = new Date().toISOString().split("T")[0]
   const pendingAppointments = appointments.filter((apt) => apt.status === "pending")
   const approvedAppointments = appointments.filter((apt) => apt.status === "confirmed" || apt.status === "attended" || apt.status === "in-progress")
-  const todayAppointments = approvedAppointments.filter((apt) => {
-    const today = new Date().toISOString().split("T")[0]
-    return apt.date === today
-  })
+  // Today's appointments should include ALL appointments for today (matching Schedule tab logic)
+  const todayAppointments = appointments.filter((apt) => apt.date === today)
 
   const navItems = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, href: "/dentist/dashboard" },

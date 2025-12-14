@@ -264,10 +264,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Import patientService dynamically to avoid circular imports
       const { patientService } = await import("./db-service")
 
-      // Check for duplicate patient name
-      const existingPatient = await patientService.getByName(name)
+      // Check for duplicate patient email (not name - multiple patients can have the same name)
+      const existingPatient = await patientService.getByEmail(user.email)
       if (existingPatient) {
-        throw new Error(`Patient with name '${name}' already exists. Please use a different name.`)
+        throw new Error(`Patient with email '${user.email}' already exists.`)
       }
 
       // Create patient record in database

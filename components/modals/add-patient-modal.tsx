@@ -34,12 +34,8 @@ export default function AddPatientModal({ onClose, onSubmit }: AddPatientModalPr
   }
 
   const generatePassword = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%"
-    let password = ""
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    return password
+    // Use default password instead of generating random one
+    return "patient123"
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,24 +49,38 @@ export default function AddPatientModal({ onClose, onSubmit }: AddPatientModalPr
     try {
       let password: string | null = null
 
-      // If creating auth account, generate password and create Supabase Auth account
+      // If creating auth account, use default password and create Supabase Auth account
       if (createAuthAccount) {
+        // Trim and validate email - only require @ symbol
+        const email = formData.email.trim().toLowerCase()
+        if (!email || !email.includes("@")) {
+          setError("Please enter a valid email address")
+          setLoading(false)
+          return
+        }
+        
         password = generatePassword()
         setGeneratedPassword(password)
         
         try {
-          await authService.signUp(formData.email, password, formData.name, "patient")
+          await authService.signUp(email, password, formData.name, "patient")
         } catch (authErr) {
           const errMsg = authErr instanceof Error ? authErr.message : String(authErr)
           // If account already exists, that's okay - we'll just create the patient record
-          if (!errMsg.toLowerCase().includes("already")) {
+          if (errMsg.toLowerCase().includes("already") || 
+              errMsg.toLowerCase().includes("user already") ||
+              errMsg.toLowerCase().includes("already registered")) {
+            // User already exists - continue to create patient record
+            console.log("[v0] User already exists, continuing with patient record creation")
+          } else {
+            // For other errors, throw them
             throw authErr
           }
         }
       }
 
-      // Create patient record
-      await onSubmit(formData)
+      // Create patient record with trimmed email
+      await onSubmit({ ...formData, email: formData.email.trim().toLowerCase() })
       
       // Clear form but keep password visible if created
       setFormData({ name: "", email: "", phone: "", dob: "", gender: "Male", address: "" })

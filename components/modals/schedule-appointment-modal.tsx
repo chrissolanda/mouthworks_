@@ -26,12 +26,18 @@ interface Dentist {
 }
 
 export default function ScheduleAppointmentModal({ onClose, onSubmit }: ScheduleAppointmentModalProps) {
+  // Set default date to today in YYYY-MM-DD format (for date input)
+  const getTodayDate = () => {
+    const today = new Date()
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  }
+  
   const [formData, setFormData] = useState({
     patient_id: "",
     patient_name: "",
     dentist_id: null as string | null,
     dentist_name: "",
-    date: "",
+    date: getTodayDate(), // Default to today
     time: "",
     service: "",
     amount: 0,
@@ -151,6 +157,10 @@ export default function ScheduleAppointmentModal({ onClose, onSubmit }: Schedule
         notes: formData.notes,
         status: "pending",
       }
+      // #region agent log
+      const today = new Date().toISOString().split("T")[0]
+      fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'components/modals/schedule-appointment-modal.tsx:155',message:'Submitting appointment - date check',data:{submittedDate:formData.date,today,patientName:formData.patient_name,service:formData.service},timestamp:Date.now(),sessionId:'debug-session',runId:'appointment-date-fix',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
       console.log("[v0] Submitting appointment for service:", formData.service, "(price: ₱" + formData.amount + " will be charged when completed)")
       onSubmit(submitData)
     } else {

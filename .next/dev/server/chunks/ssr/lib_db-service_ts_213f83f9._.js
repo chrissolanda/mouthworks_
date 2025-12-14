@@ -206,6 +206,28 @@ const appointmentService = {
     },
     async create (appointment) {
         try {
+            // #region agent log
+            const today = new Date().toISOString().split("T")[0];
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:224',
+                    message: 'DB service - before insert',
+                    data: {
+                        appointmentDate: appointment.date,
+                        today,
+                        patientId: appointment.patient_id
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] 💾 Creating appointment in database:", appointment);
             const { data, error } = await getSupabase().from("appointments").insert([
                 appointment
@@ -214,6 +236,28 @@ const appointmentService = {
                 console.error("[v0] ❌ Supabase error creating appointment:", error);
                 throw new Error(`Failed to create appointment: ${error.message}`);
             }
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:235',
+                    message: 'DB service - after insert',
+                    data: {
+                        submittedDate: appointment.date,
+                        savedDate: data?.date,
+                        today,
+                        patientName: data?.patients?.name
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] ✅ Appointment saved to database:", data);
             return data;
         } catch (err) {

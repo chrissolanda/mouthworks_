@@ -744,6 +744,28 @@ const appointmentService = {
     },
     async create (appointment) {
         try {
+            // #region agent log
+            const today = new Date().toISOString().split("T")[0];
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:224',
+                    message: 'DB service - before insert',
+                    data: {
+                        appointmentDate: appointment.date,
+                        today,
+                        patientId: appointment.patient_id
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] 💾 Creating appointment in database:", appointment);
             const { data, error } = await getSupabase().from("appointments").insert([
                 appointment
@@ -752,6 +774,28 @@ const appointmentService = {
                 console.error("[v0] ❌ Supabase error creating appointment:", error);
                 throw new Error(`Failed to create appointment: ${error.message}`);
             }
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/c0a6aa0c-74d6-4100-87e9-5e0b60c6253b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    location: 'lib/db-service.ts:235',
+                    message: 'DB service - after insert',
+                    data: {
+                        submittedDate: appointment.date,
+                        savedDate: data?.date,
+                        today,
+                        patientName: data?.patients?.name
+                    },
+                    timestamp: Date.now(),
+                    sessionId: 'debug-session',
+                    runId: 'appointment-date-fix',
+                    hypothesisId: 'A'
+                })
+            }).catch(()=>{});
+            // #endregion
             console.log("[v0] ✅ Appointment saved to database:", data);
             return data;
         } catch (err) {
@@ -1292,19 +1336,48 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2d$client$2e
 ;
 const authService = {
     async signUp (email, password, name, role) {
-        const supabase = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2d$client$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getSupabaseClient"])();
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    name,
-                    role
-                }
+        // Trim and normalize email
+        const normalizedEmail = email.trim().toLowerCase();
+        // Basic email validation - only require @ symbol
+        if (!normalizedEmail || !normalizedEmail.includes("@")) {
+            throw new Error("Invalid email address format");
+        }
+        // Use server-side registration API directly (primary method)
+        // This avoids Supabase Auth email validation issues and uses the custom auth_users table
+        try {
+            const response = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: normalizedEmail,
+                    password: password,
+                    name: name
+                })
+            });
+            const result = await response.json();
+            if (response.ok && result.status === "created") {
+                // Server-side registration succeeded
+                return {
+                    user: result.user
+                };
+            } else if (result.status === "exists" || response.status === 409) {
+                // User already exists
+                throw new Error("User already exists");
+            } else {
+                // Registration failed
+                throw new Error(result.error || "Registration failed");
             }
-        });
-        if (error) throw error;
-        return data;
+        } catch (apiError) {
+            // If it's "already exists", throw that
+            const errorMsg = apiError instanceof Error ? apiError.message : String(apiError);
+            if (errorMsg.includes("already exists") || errorMsg.includes("exists")) {
+                throw new Error("User already exists");
+            }
+            // For other errors, throw them
+            throw apiError;
+        }
     },
     async signIn (email, password) {
         const supabase = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2d$client$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getSupabaseClient"])();
@@ -1421,12 +1494,8 @@ function AddPatientModal({ onClose, onSubmit }) {
             }));
     };
     const generatePassword = ()=>{
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
-        let password = "";
-        for(let i = 0; i < 12; i++){
-            password += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return password;
+        // Use default password instead of generating random one
+        return "patient123";
     };
     const handleSubmit = async (e)=>{
         e.preventDefault();
@@ -1438,22 +1507,36 @@ function AddPatientModal({ onClose, onSubmit }) {
         setLoading(true);
         try {
             let password = null;
-            // If creating auth account, generate password and create Supabase Auth account
+            // If creating auth account, use default password and create Supabase Auth account
             if (createAuthAccount) {
+                // Trim and validate email - only require @ symbol
+                const email = formData.email.trim().toLowerCase();
+                if (!email || !email.includes("@")) {
+                    setError("Please enter a valid email address");
+                    setLoading(false);
+                    return;
+                }
                 password = generatePassword();
                 setGeneratedPassword(password);
                 try {
-                    await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authService"].signUp(formData.email, password, formData.name, "patient");
+                    await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["authService"].signUp(email, password, formData.name, "patient");
                 } catch (authErr) {
                     const errMsg = authErr instanceof Error ? authErr.message : String(authErr);
                     // If account already exists, that's okay - we'll just create the patient record
-                    if (!errMsg.toLowerCase().includes("already")) {
+                    if (errMsg.toLowerCase().includes("already") || errMsg.toLowerCase().includes("user already") || errMsg.toLowerCase().includes("already registered")) {
+                        // User already exists - continue to create patient record
+                        console.log("[v0] User already exists, continuing with patient record creation");
+                    } else {
+                        // For other errors, throw them
                         throw authErr;
                     }
                 }
             }
-            // Create patient record
-            await onSubmit(formData);
+            // Create patient record with trimmed email
+            await onSubmit({
+                ...formData,
+                email: formData.email.trim().toLowerCase()
+            });
             // Clear form but keep password visible if created
             setFormData({
                 name: "",
@@ -1498,7 +1581,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                 children: "Patient Account Created"
                             }, void 0, false, {
                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                lineNumber: 106,
+                                lineNumber: 116,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1508,18 +1591,18 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     className: "w-5 h-5"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 108,
+                                    lineNumber: 118,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                lineNumber: 107,
+                                lineNumber: 117,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/modals/add-patient-modal.tsx",
-                        lineNumber: 105,
+                        lineNumber: 115,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1532,12 +1615,12 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: "✓ Patient and login account created successfully"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 114,
+                                    lineNumber: 124,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                lineNumber: 113,
+                                lineNumber: 123,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1548,7 +1631,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                         children: "Email"
                                     }, void 0, false, {
                                         fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                        lineNumber: 120,
+                                        lineNumber: 130,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1556,13 +1639,13 @@ function AddPatientModal({ onClose, onSubmit }) {
                                         children: formData.email
                                     }, void 0, false, {
                                         fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                        lineNumber: 121,
+                                        lineNumber: 131,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                lineNumber: 119,
+                                lineNumber: 129,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1573,7 +1656,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                         children: "Temporary Password"
                                     }, void 0, false, {
                                         fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                        lineNumber: 125,
+                                        lineNumber: 135,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1584,7 +1667,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                                 children: generatedPassword
                                             }, void 0, false, {
                                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                                lineNumber: 127,
+                                                lineNumber: 137,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1597,30 +1680,30 @@ function AddPatientModal({ onClose, onSubmit }) {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                                    lineNumber: 135,
+                                                    lineNumber: 145,
                                                     columnNumber: 37
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$copy$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Copy$3e$__["Copy"], {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                                    lineNumber: 135,
+                                                    lineNumber: 145,
                                                     columnNumber: 69
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                                lineNumber: 128,
+                                                lineNumber: 138,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                        lineNumber: 126,
+                                        lineNumber: 136,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                lineNumber: 124,
+                                lineNumber: 134,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1630,14 +1713,14 @@ function AddPatientModal({ onClose, onSubmit }) {
                                         children: "Note:"
                                     }, void 0, false, {
                                         fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                        lineNumber: 141,
+                                        lineNumber: 151,
                                         columnNumber: 15
                                     }, this),
                                     " Share this password with the patient. They should change it on first login."
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                lineNumber: 140,
+                                lineNumber: 150,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1646,24 +1729,24 @@ function AddPatientModal({ onClose, onSubmit }) {
                                 children: "Done"
                             }, void 0, false, {
                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                lineNumber: 144,
+                                lineNumber: 154,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/modals/add-patient-modal.tsx",
-                        lineNumber: 112,
+                        lineNumber: 122,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                lineNumber: 104,
+                lineNumber: 114,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/modals/add-patient-modal.tsx",
-            lineNumber: 103,
+            lineNumber: 113,
             columnNumber: 7
         }, this);
     }
@@ -1680,7 +1763,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                             children: "Add New Patient"
                         }, void 0, false, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 158,
+                            lineNumber: 168,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1690,18 +1773,18 @@ function AddPatientModal({ onClose, onSubmit }) {
                                 className: "w-5 h-5"
                             }, void 0, false, {
                                 fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                lineNumber: 160,
+                                lineNumber: 170,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 159,
+                            lineNumber: 169,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                    lineNumber: 157,
+                    lineNumber: 167,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1713,7 +1796,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 167,
+                            lineNumber: 177,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1724,7 +1807,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: "Full Name"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 172,
+                                    lineNumber: 182,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1736,13 +1819,13 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     required: true
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 173,
+                                    lineNumber: 183,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 171,
+                            lineNumber: 181,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1753,7 +1836,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: "Email"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 184,
+                                    lineNumber: 194,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1766,13 +1849,13 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     required: true
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 185,
+                                    lineNumber: 195,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 183,
+                            lineNumber: 193,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1783,7 +1866,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: "Phone"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 197,
+                                    lineNumber: 207,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1795,13 +1878,13 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     required: true
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 198,
+                                    lineNumber: 208,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 196,
+                            lineNumber: 206,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1812,7 +1895,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: "Date of Birth"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 209,
+                                    lineNumber: 219,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1823,13 +1906,13 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     className: "border-border"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 210,
+                                    lineNumber: 220,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 208,
+                            lineNumber: 218,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1840,7 +1923,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: "Gender"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 214,
+                                    lineNumber: 224,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -1853,33 +1936,33 @@ function AddPatientModal({ onClose, onSubmit }) {
                                             children: "Male"
                                         }, void 0, false, {
                                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                            lineNumber: 221,
+                                            lineNumber: 231,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                             children: "Female"
                                         }, void 0, false, {
                                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                            lineNumber: 222,
+                                            lineNumber: 232,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                             children: "Other"
                                         }, void 0, false, {
                                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                            lineNumber: 223,
+                                            lineNumber: 233,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 215,
+                                    lineNumber: 225,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 213,
+                            lineNumber: 223,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1890,7 +1973,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: "Address"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 228,
+                                    lineNumber: 238,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1901,13 +1984,13 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     className: "border-border"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 229,
+                                    lineNumber: 239,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 227,
+                            lineNumber: 237,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1921,7 +2004,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     className: "rounded border-border"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 239,
+                                    lineNumber: 249,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -1930,13 +2013,13 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: "Create login account (auto-generate password)"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 246,
+                                    lineNumber: 256,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 238,
+                            lineNumber: 248,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1950,7 +2033,7 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 252,
+                                    lineNumber: 262,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1960,34 +2043,34 @@ function AddPatientModal({ onClose, onSubmit }) {
                                     children: loading ? "Adding..." : "Add Patient"
                                 }, void 0, false, {
                                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                                    lineNumber: 255,
+                                    lineNumber: 265,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/modals/add-patient-modal.tsx",
-                            lineNumber: 251,
+                            lineNumber: 261,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/modals/add-patient-modal.tsx",
-                    lineNumber: 165,
+                    lineNumber: 175,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/modals/add-patient-modal.tsx",
-            lineNumber: 155,
+            lineNumber: 165,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/modals/add-patient-modal.tsx",
-        lineNumber: 154,
+        lineNumber: 164,
         columnNumber: 5
     }, this);
 }
-_s(AddPatientModal, "flgBSangsR9GK62p5HVRQ7NCPc0=");
+_s(AddPatientModal, "DimF91zvGdE+ebHyGvLLUAwfOGQ=");
 _c = AddPatientModal;
 var _c;
 __turbopack_context__.k.register(_c, "AddPatientModal");
@@ -3103,10 +3186,10 @@ function HRPatients() {
     ];
     const handleAddPatient = async (data)=>{
         try {
-            // Check for duplicate patient name
-            const existingPatient = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["patientService"].getByName(data.name);
+            // Check for duplicate patient email (not name - multiple patients can have the same name)
+            const existingPatient = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["patientService"].getByEmail(data.email);
             if (existingPatient) {
-                throw new Error(`Patient with name '${data.name}' already exists. Please use a different name.`);
+                throw new Error(`Patient with email '${data.email}' already exists. Please use a different email.`);
             }
             const newPatient = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$service$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["patientService"].create(data);
             if (newPatient) {

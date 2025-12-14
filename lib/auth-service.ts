@@ -2,21 +2,49 @@ import { getSupabaseClient } from "./supabase-client"
 
 export const authService = {
   async signUp(email: string, password: string, name: string, role: "patient" | "dentist" | "hr") {
-    const supabase = getSupabaseClient()
+    // Trim and normalize email
+    const normalizedEmail = email.trim().toLowerCase()
+    
+    // Basic email validation - only require @ symbol
+    if (!normalizedEmail || !normalizedEmail.includes("@")) {
+      throw new Error("Invalid email address format")
+    }
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-          role,
-        },
-      },
-    })
-
-    if (error) throw error
-    return data
+    // Use server-side registration API directly (primary method)
+    // This avoids Supabase Auth email validation issues and uses the custom auth_users table
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          password: password,
+          name: name,
+        }),
+      })
+      
+      const result = await response.json()
+      
+      if (response.ok && result.status === "created") {
+        // Server-side registration succeeded
+        return { user: result.user }
+      } else if (result.status === "exists" || response.status === 409) {
+        // User already exists
+        throw new Error("User already exists")
+      } else {
+        // Registration failed
+        throw new Error(result.error || "Registration failed")
+      }
+    } catch (apiError) {
+      // If it's "already exists", throw that
+      const errorMsg = apiError instanceof Error ? apiError.message : String(apiError)
+      if (errorMsg.includes("already exists") || errorMsg.includes("exists")) {
+        throw new Error("User already exists")
+      }
+      
+      // For other errors, throw them
+      throw apiError
+    }
   },
 
   async signIn(email: string, password: string) {
