@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { LayoutDashboard, Calendar, User, CreditCard, CalendarIcon, Clock, Trash2, Edit, Plus, CheckCircle } from "lucide-react"
 import { appointmentService, patientService } from "@/lib/db-service"
 import PatientBookAppointmentModal from "@/components/modals/patient-book-appointment-modal"
+import PatientRescheduleAppointmentModal from "@/components/modals/patient-reschedule-appointment-modal"
 
 export default function PatientAppointments() {
   const { user } = useAuth()
@@ -15,6 +16,8 @@ export default function PatientAppointments() {
   const [patientId, setPatientId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [showBookModal, setShowBookModal] = useState(false)
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false)
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
   const [bookingSuccess, setBookingSuccess] = useState(false)
 
   useEffect(() => {
@@ -99,6 +102,24 @@ export default function PatientAppointments() {
       const msg = err instanceof Error ? err.message : String(err)
       console.error("[v0] Error marking attended:", msg)
       alert("Failed to mark as attended")
+    }
+  }
+
+  const handleRescheduleAppointment = (appointment: any) => {
+    setSelectedAppointment(appointment)
+    setShowRescheduleModal(true)
+  }
+
+  const handleRescheduleSubmit = async (updatedAppointment: any) => {
+    try {
+      setAppointments((prev) => prev.map((a) => (a.id === updatedAppointment.id ? updatedAppointment : a)))
+      setShowRescheduleModal(false)
+      setSelectedAppointment(null)
+      setBookingSuccess(true)
+      setTimeout(() => setBookingSuccess(false), 5000)
+    } catch (error) {
+      console.error("[v0] Error updating appointment:", error)
+      alert("Failed to reschedule appointment")
     }
   }
 
@@ -244,7 +265,12 @@ export default function PatientAppointments() {
                           Mark as Attended
                         </Button>
                       )}
-                      <Button variant="outline" size="sm" className="text-xs bg-transparent">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs bg-transparent"
+                        onClick={() => handleRescheduleAppointment(apt)}
+                      >
                         <Edit className="w-3 h-3 mr-1" />
                         Reschedule
                       </Button>
@@ -310,6 +336,18 @@ export default function PatientAppointments() {
         <PatientBookAppointmentModal
           onClose={() => setShowBookModal(false)}
           onSubmit={handleBookAppointment}
+        />
+      )}
+
+      {showRescheduleModal && selectedAppointment && (
+        <PatientRescheduleAppointmentModal
+          isOpen={showRescheduleModal}
+          onClose={() => {
+            setShowRescheduleModal(false)
+            setSelectedAppointment(null)
+          }}
+          onSubmit={handleRescheduleSubmit}
+          appointment={selectedAppointment}
         />
       )}
     </MainLayout>

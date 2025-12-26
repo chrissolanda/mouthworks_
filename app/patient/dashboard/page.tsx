@@ -17,6 +17,8 @@ export default function PatientDashboard() {
     lastVisit: "",
   })
   const [recentAppointments, setRecentAppointments] = useState<any[]>([])
+  const [upcomingAppointments, setUpcomingAppointments] = useState<any[]>([])
+  const [recentPayments, setRecentPayments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -50,8 +52,19 @@ export default function PatientDashboard() {
           payments = []
         }
 
+        // Separate upcoming and recent appointments
+        const now = new Date()
+        const upcoming = appointments?.filter((a: any) => {
+          const appointmentDate = new Date(a.date)
+          return a.status !== "completed" && appointmentDate >= now
+        }) || []
+        const recent = appointments?.filter((a: any) => {
+          const appointmentDate = new Date(a.date)
+          return appointmentDate < now
+        })?.slice(0, 3) || []
+
         // Calculate stats
-        const upcoming = appointments?.filter((a: any) => a.status !== "completed")?.length || 0
+        const upcomingCount = upcoming.length
         const outstandingBalance =
           payments
             ?.filter((p: any) => p.status !== "paid")
@@ -61,8 +74,13 @@ export default function PatientDashboard() {
         const lastVisit =
           completed.length > 0 ? new Date(completed[0].date).toLocaleDateString() : "No visits yet"
 
-        setStats({ upcomingCount: upcoming, outstandingBalance, lastVisit })
-        setRecentAppointments(appointments?.slice(0, 3) || [])
+        // Get recent payments (paid ones)
+        const recentPaymentsData = payments?.filter((p: any) => p.status === "paid")?.slice(0, 3) || []
+
+        setStats({ upcomingCount, outstandingBalance, lastVisit })
+        setUpcomingAppointments(upcoming)
+        setRecentAppointments(recent)
+        setRecentPayments(recentPaymentsData)
       } catch (error) {
         console.error("[v0] Error loading dashboard:", error instanceof Error ? error.message : error)
         // Set defaults on error
@@ -184,6 +202,45 @@ export default function PatientDashboard() {
           </Link>
         </div>
 
+        {/* Upcoming Appointments */}
+        {upcomingAppointments.length > 0 && (
+          <Card className="border-2 shadow-md border-primary/20 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-primary">📅 Upcoming Appointments</CardTitle>
+              <CardDescription className="text-base">Your scheduled appointments</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {upcomingAppointments.map((apt) => (
+                  <div
+                    key={apt.id}
+                    className="flex items-center justify-between p-4 border border-primary/30 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Calendar className="w-5 h-5 text-primary" />
+                      <div>
+                        <p className="font-semibold text-foreground">{apt.service}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(apt.date).toLocaleDateString()} at {apt.time}
+                        </p>
+                        <p className="text-xs text-primary font-medium">
+                          {apt.status === "confirmed" ? "✅ Confirmed" : apt.status === "pending" ? "⏳ Pending" : apt.status}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-muted-foreground">{apt.dentists?.name || "TBD"}</p>
+                      <Link href="/patient/appointments" className="text-xs text-primary hover:underline">
+                        View Details →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Recent Appointments */}
         <Card className="border-2 shadow-md">
           <CardHeader>
@@ -214,6 +271,51 @@ export default function PatientDashboard() {
                     <p className="text-sm font-medium text-muted-foreground">{apt.dentists?.name || "TBD"}</p>
                   </div>
                 ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Payment History */}
+        <Card className="border-2 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">💳 Recent Payments</CardTitle>
+            <CardDescription className="text-base">Your payment history</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="text-center py-4 text-muted-foreground">Loading...</div>
+            ) : recentPayments.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground">No payments yet</div>
+            ) : (
+              <div className="space-y-4">
+                {recentPayments.map((payment) => (
+                  <div
+                    key={payment.id}
+                    className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="w-4 h-4 text-green-600" />
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {payment.appointments?.service || "Dental Service"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {payment.date ? new Date(payment.date).toLocaleDateString() : "Date not available"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-green-600">{formatCurrency(payment.amount)}</p>
+                      <p className="text-xs text-green-600 font-medium">✅ Paid</p>
+                    </div>
+                  </div>
+                ))}
+                <div className="pt-2 border-t">
+                  <Link href="/patient/payments" className="text-sm text-primary hover:underline">
+                    View all payment history →
+                  </Link>
+                </div>
               </div>
             )}
           </CardContent>

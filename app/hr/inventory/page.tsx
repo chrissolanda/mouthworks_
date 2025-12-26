@@ -81,7 +81,9 @@ export default function HRInventory() {
       const inventoryWithStatus = (inventoryData || []).map((item: any) => {
         let status = "ok"
         const minQty = item.min_quantity || 0
-        if (item.quantity <= 0) {
+        const criticalThreshold = minQty * 0.85 // 15% below minimum level
+
+        if (item.quantity <= 0 || (item.min_quantity && item.quantity <= criticalThreshold)) {
           status = "critical"
         } else if (item.min_quantity && item.quantity <= minQty) {
           status = "low"
@@ -242,28 +244,65 @@ export default function HRInventory() {
           </Card>
         </div>
 
-        {/* Low Stock Alert Section */}
-        {lowStockItems.length > 0 && (
-          <Card className="border-yellow-300 bg-yellow-50/50">
+        {/* Critical Stock Alert Section */}
+        {inventory.filter((i) => i.status === "critical").length > 0 && (
+          <Card className="border-red-300 bg-red-50/50">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-yellow-900">
-                <AlertCircle className="w-5 h-5 text-yellow-600" />
-                Low Stock Alert ({lowStockItems.length} item{lowStockItems.length !== 1 ? 's' : ''})
+              <CardTitle className="flex items-center gap-2 text-red-900">
+                <AlertCircle className="w-5 h-5 text-red-600 animate-pulse" />
+                🚨 CRITICAL STOCK - URGENT RESTOCK NEEDED ({inventory.filter((i) => i.status === "critical").length} item{inventory.filter((i) => i.status === "critical").length !== 1 ? 's' : ''})
               </CardTitle>
-              <CardDescription className="text-yellow-800">
-                These items are below minimum stock level and need restocking
+              <CardDescription className="text-red-800">
+                These items are out of stock or critically low. Immediate restocking required to avoid service disruption.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {lowStockItems.map((item) => (
+                {inventory.filter((i) => i.status === "critical").map((item) => (
                   <div
                     key={item.id}
-                    className={`p-4 border-2 rounded-lg ${
-                      item.status === "critical"
-                        ? "border-red-300 bg-red-50/50"
-                        : "border-yellow-300 bg-white"
-                    }`}
+                    className="p-4 border-2 border-red-400 bg-red-100/50 rounded-lg animate-pulse"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <p className="font-bold text-red-900">{item.name}</p>
+                        <p className="text-sm text-red-700">{item.category || "Uncategorized"}</p>
+                        <p className="text-xs text-red-600 font-semibold mt-1">⚠️ OUT OF STOCK - URGENT RESTOCK REQUIRED</p>
+                      </div>
+                      <div className="text-right mr-4">
+                        <p className="text-sm text-red-700">Current: <span className="font-bold text-red-900">{item.quantity}</span></p>
+                        <p className="text-sm text-red-700">Minimum: <span className="font-bold text-red-900">{item.min_quantity}</span></p>
+                      </div>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-red-200 text-red-800">
+                        <AlertCircle className="w-3 h-3" />
+                        CRITICAL
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Low Stock Alert Section */}
+        {inventory.filter((i) => i.status === "low").length > 0 && (
+          <Card className="border-yellow-300 bg-yellow-50/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-yellow-900">
+                <TrendingDown className="w-5 h-5 text-yellow-600" />
+                Low Stock Alert ({inventory.filter((i) => i.status === "low").length} item{inventory.filter((i) => i.status === "low").length !== 1 ? 's' : ''})
+              </CardTitle>
+              <CardDescription className="text-yellow-800">
+                These items are below minimum stock level and need restocking soon
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {inventory.filter((i) => i.status === "low").map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-4 border-2 border-yellow-300 bg-white rounded-lg"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -274,16 +313,9 @@ export default function HRInventory() {
                         <p className="text-sm text-muted-foreground">Current: <span className="font-bold text-foreground">{item.quantity}</span></p>
                         <p className="text-sm text-muted-foreground">Minimum: <span className="font-bold text-foreground">{item.min_quantity}</span></p>
                       </div>
-                      <span
-                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                          item.status === "critical"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {item.status === "critical" && <AlertCircle className="w-3 h-3" />}
-                        {item.status === "low" && <TrendingDown className="w-3 h-3" />}
-                        {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                        <TrendingDown className="w-3 h-3" />
+                        Low Stock
                       </span>
                     </div>
                   </div>
@@ -428,7 +460,7 @@ export default function HRInventory() {
                     </div>
                     <p className="text-sm text-foreground mb-2">Quantity: {request.quantity}</p>
                     <p className="text-xs text-muted-foreground mb-3">
-                      Date: {request.requested_date ? new Date(request.requested_date).toLocaleDateString() : "-"}
+                      Date: {request.request_date ? new Date(request.request_date).toLocaleDateString() : "-"}
                     </p>
                     {request.status === "pending" && (
                       <div className="flex gap-2">

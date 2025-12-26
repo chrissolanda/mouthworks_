@@ -725,7 +725,7 @@ export const supplyRequestService = {
     const { data, error } = await getSupabase()
       .from("supplyrequest")
       .select("*, inventory(name, category), staff(name)")
-      .order("requested_date", { ascending: false })
+      .order("request_date", { ascending: false })
     if (error) throw error
     
     // Try to fetch dentist info separately if dentist_id exists
